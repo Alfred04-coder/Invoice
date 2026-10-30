@@ -1,0 +1,736 @@
+﻿
+@using InvoiceManagement.Models
+@using InvoiceManagement.ViewModel
+@model InvoiceManagement.ViewModel.InvoiceViewModel
+
+@{
+    ViewData["Title"] = "Edit Invoice";
+}
+
+<style>
+    :root {
+        --invoice-navy: #17243a;
+        --invoice-blue: #315efb;
+        --invoice-muted: #718096;
+        --invoice-border: #e5eaf1;
+        --invoice-bg: #f5f7fb;
+    }
+
+    body {
+        background-color: var(--invoice-bg);
+    }
+
+    .invoice-page {
+        max-width: 1250px;
+        margin: 35px auto;
+        padding: 0 18px 40px;
+    }
+
+    .page-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-bottom: 25px;
+    }
+
+        .page-heading h2 {
+            color: var(--invoice-navy);
+            font-size: 27px;
+            font-weight: 750;
+            letter-spacing: -.6px;
+            margin-bottom: 5px;
+        }
+
+        .page-heading p {
+            color: var(--invoice-muted);
+            margin: 0;
+            font-size: 14px;
+        }
+
+    .invoice-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 14px;
+        background: #eaf0ff;
+        color: #315efb;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .invoice-card {
+        background: #fff;
+        border: 1px solid var(--invoice-border);
+        border-radius: 14px;
+        box-shadow: 0 5px 22px rgba(23, 36, 58, .045);
+        overflow: hidden;
+        margin-bottom: 22px;
+    }
+
+    .invoice-card-header {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        padding: 21px 25px;
+        border-bottom: 1px solid var(--invoice-border);
+    }
+
+    .header-icon {
+        width: 43px;
+        height: 43px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #edf2ff;
+        color: var(--invoice-blue);
+        border-radius: 11px;
+        font-size: 21px;
+    }
+
+    .invoice-card-header h5 {
+        color: var(--invoice-navy);
+        font-size: 16px;
+        font-weight: 750;
+        margin: 0 0 4px;
+    }
+
+    .invoice-card-header p {
+        color: var(--invoice-muted);
+        font-size: 12px;
+        margin: 0;
+    }
+
+    .invoice-card-body {
+        padding: 25px;
+    }
+
+    .form-label {
+        color: #344054;
+        font-size: 13px;
+        font-weight: 650;
+        margin-bottom: 8px;
+    }
+
+    .form-control,
+    .form-select {
+        min-height: 44px;
+        border: 1px solid #dce2eb;
+        border-radius: 8px;
+        font-size: 14px;
+        color: #243247;
+        box-shadow: none;
+    }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #7190ff;
+            box-shadow: 0 0 0 3px rgba(49, 94, 251, .10);
+        }
+
+    .items-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+    }
+
+        .items-toolbar h5 {
+            color: var(--invoice-navy);
+            font-size: 16px;
+            font-weight: 750;
+            margin: 0 0 5px;
+        }
+
+        .items-toolbar p {
+            font-size: 12px;
+            color: var(--invoice-muted);
+            margin: 0;
+        }
+
+    .btn-add-product {
+        background: #eaf8f0;
+        color: #16834c;
+        border: 1px solid #c8eed7;
+        padding: 10px 15px;
+        font-size: 13px;
+        font-weight: 700;
+        border-radius: 8px;
+    }
+
+        .btn-add-product:hover {
+            background: #d9f2e4;
+            color: #116b3e;
+        }
+
+    .table-wrap {
+        border: 1px solid var(--invoice-border);
+        border-radius: 10px;
+        overflow-x: auto;
+    }
+
+    .invoice-table {
+        margin: 0;
+        min-width: 760px;
+    }
+
+        .invoice-table thead th {
+            background: #f7f9fc;
+            color: #667085;
+            font-size: 11px;
+            font-weight: 750;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            padding: 16px 14px;
+            border-bottom: 1px solid var(--invoice-border);
+            white-space: nowrap;
+        }
+
+        .invoice-table tbody td {
+            padding: 13px 12px;
+            vertical-align: middle;
+            border-color: #edf0f5;
+        }
+
+        .invoice-table tbody tr:hover {
+            background: #fbfcff;
+        }
+
+        .invoice-table .form-control,
+        .invoice-table .form-select {
+            min-height: 41px;
+            font-size: 13px;
+        }
+
+    .subtotal {
+        font-weight: 750;
+        color: var(--invoice-navy);
+        white-space: nowrap;
+    }
+
+    .currency {
+        color: #8490a3;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .btn-remove {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        background: #fff0f0;
+        border: 1px solid #ffd9d9;
+        border-radius: 8px;
+        color: #d93636;
+        font-size: 17px;
+    }
+
+        .btn-remove:hover {
+            background: #ffe1e1;
+            color: #b42318;
+        }
+
+    .empty-items {
+        text-align: center;
+        padding: 30px 15px;
+        color: var(--invoice-muted);
+        font-size: 13px;
+    }
+
+    .total-panel {
+        background: var(--invoice-navy);
+        color: #fff;
+        border-radius: 13px;
+        padding: 24px;
+        box-shadow: 0 8px 20px rgba(23, 36, 58, .12);
+    }
+
+    .total-label {
+        font-size: 12px;
+        color: #c3ccdc;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 650;
+        margin-bottom: 8px;
+    }
+
+    .total-amount {
+        font-size: 30px;
+        font-weight: 800;
+        letter-spacing: -.8px;
+        overflow-wrap: anywhere;
+    }
+
+    .total-note {
+        font-size: 12px;
+        color: #c3ccdc;
+        margin-top: 7px;
+    }
+
+    .total-icon {
+        font-size: 28px;
+        color: #b9c8ff;
+    }
+
+    .form-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 24px;
+    }
+
+    .btn-save {
+        background: var(--invoice-blue);
+        color: white;
+        border: 1px solid var(--invoice-blue);
+        border-radius: 8px;
+        padding: 12px 22px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+        .btn-save:hover {
+            background: #2349d8;
+            border-color: #2349d8;
+            color: #fff;
+        }
+
+    .btn-cancel {
+        background: #fff;
+        color: #475467;
+        border: 1px solid #dce2eb;
+        border-radius: 8px;
+        padding: 12px 20px;
+        font-size: 13px;
+        font-weight: 650;
+    }
+
+        .btn-cancel:hover {
+            background: #f0f3f8;
+            color: var(--invoice-navy);
+        }
+
+    .validation-summary-valid {
+        display: none;
+    }
+
+    .validation-summary-errors {
+        color: #b42318;
+        background: #fff1f0;
+        border: 1px solid #ffd5d2;
+        padding: 13px 17px;
+        border-radius: 9px;
+        margin-bottom: 20px;
+        font-size: 13px;
+    }
+
+    @@media (max-width: 576px) {
+        .invoice-page {
+            margin-top: 20px;
+            padding: 0 12px 25px;
+        }
+
+        .page-heading h2 {
+            font-size: 23px;
+        }
+
+        .invoice-card-header,
+        .invoice-card-body {
+            padding: 17px;
+        }
+
+        .total-amount {
+            font-size: 25px;
+        }
+
+        .form-footer {
+            align-items: stretch;
+        }
+
+            .form-footer > div,
+            .form-footer button,
+            .form-footer a {
+                width: 100%;
+            }
+    }
+</style>
+
+<div class="invoice-page">
+
+    <div class="page-heading">
+        <div>
+            <h2>Edit Invoice</h2>
+            <p>Update customer details, products and invoice totals.</p>
+        </div>
+
+        <div class="invoice-badge">
+            <span>✎</span>
+            Invoice #@Model.InvoiceId
+        </div>
+    </div>
+
+    <form asp-controller="Admin"
+          asp-action="EditInvoice"
+          method="post"
+          id="editInvoiceForm">
+
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" asp-for="InvoiceId" />
+
+        <div asp-validation-summary="ModelOnly"></div>
+
+        <!-- Customer details -->
+        <div class="invoice-card">
+            <div class="invoice-card-header">
+                <div class="header-icon">♙</div>
+                <div>
+                    <h5>Customer Information</h5>
+                    <p>Enter the customer's contact details.</p>
+                </div>
+            </div>
+
+            <div class="invoice-card-body">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <label asp-for="CustomerName" class="form-label">
+                            Customer Name <span class="text-danger">*</span>
+                        </label>
+
+                        <input asp-for="CustomerName"
+                               class="form-control"
+                               placeholder="Enter customer name"
+                               required />
+
+                        <span asp-validation-for="CustomerName"
+                              class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="CustomerPhone" class="form-label">
+                            Phone Number <span class="text-danger">*</span>
+                        </label>
+
+                        <input asp-for="CustomerPhone"
+                               class="form-control"
+                               type="tel"
+                               placeholder="Enter phone number"
+                               required />
+
+                        <span asp-validation-for="CustomerPhone"
+                              class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Invoice products -->
+        <div class="invoice-card">
+            <div class="invoice-card-header">
+                <div class="header-icon">▤</div>
+                <div>
+                    <h5>Invoice Items</h5>
+                    <p>Manage the products and quantities on this invoice.</p>
+                </div>
+            </div>
+
+            <div class="invoice-card-body">
+
+                <div class="items-toolbar">
+                    <div>
+                        <h5>Products & Pricing</h5>
+                        <p>Choose a product and enter the quantity required.</p>
+                    </div>
+
+                    <button type="button"
+                            class="btn btn-add-product"
+                            id="addItem">
+                        + Add Product
+                    </button>
+                </div>
+
+                <div class="table-wrap">
+                    <table class="table invoice-table align-middle">
+                        <thead>
+                            <tr>
+                                <th style="min-width:220px;">Product</th>
+                                <th style="width:115px;">Quantity</th>
+                                <th style="width:155px;">Unit Price</th>
+                                <th style="width:145px;">Subtotal</th>
+                                <th class="text-center" style="width:75px;">Remove</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="itemsBody">
+                            @if (Model.Items != null)
+                            {
+                                @for (int i = 0; i < Model.Items.Count; i++)
+                                {
+                                    <tr class="invoice-item">
+                                        <td>
+                                            <select name="Items[@i].ProductId"
+                                                    class="form-select product-select"
+                                                    required>
+                                                <option value="">Select a product</option>
+
+                                                @foreach (var product in Model.Products)
+                                                {
+                                                    <option value="@product.ProductId"
+                                                            data-price="@product.SellingPrice"
+                                                            selected="@(product.ProductId == Model.Items[i].ProductId)">
+                                                        @product.Name
+                                                    </option>
+                                                }
+                                            </select>
+                                        </td>
+
+                                        <td>
+                                            <input type="number"
+                                                   name="Items[@i].Quantity"
+                                                   value="@Model.Items[i].Quantity"
+                                                   class="form-control quantity"
+                                                   min="1"
+                                                   step="1"
+                                                   required />
+                                        </td>
+
+                                        <td>
+                                            <input type="number"
+                                                   name="Items[@i].SellingPrice"
+                                                   value="@Model.Items[i].SellingPrice"
+                                                   class="form-control price"
+                                                   min="0.01"
+                                                   step="0.01"
+                                                   required />
+                                        </td>
+
+                                        <td>
+                                            <span class="currency">GH₵ </span><span class="subtotal">0.00</span>
+                                        </td>
+
+                                        <td class="text-center">
+                                            <button type="button"
+                                                    class="btn-remove removeItem"
+                                                    title="Remove product"
+                                                    aria-label="Remove product">
+                                                &times;
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+
+                    <div id="emptyItems" class="empty-items d-none">
+                        No products added yet. Click "Add Product" to begin.
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <span class="text-secondary small">
+                        Number of items: <strong id="itemCount">0</strong>
+                    </span>
+                    <span class="text-secondary small">
+                        All prices are in Ghana cedis (GH₵).
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grand total -->
+        <div class="row justify-content-end">
+            <div class="col-lg-5 col-md-7">
+                <div class="total-panel">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="total-label">Invoice Grand Total</div>
+
+                            <div class="total-amount">
+                                GH₵ <span id="grandTotal">0.00</span>
+                            </div>
+
+                            <div class="total-note">
+                                Calculated from all invoice items.
+                            </div>
+                        </div>
+
+                        <div class="total-icon">▤</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-footer">
+            <div>
+                <a asp-controller="Admin"
+                   asp-action="SalesList"
+                   class="btn btn-cancel">
+                    ← Cancel
+                </a>
+            </div>
+
+            <button type="submit" class="btn btn-save" id="saveButton">
+                Save Invoice Changes
+            </button>
+        </div>
+
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        const itemsBody = document.getElementById("itemsBody");
+        const grandTotalElement = document.getElementById("grandTotal");
+        const itemCountElement = document.getElementById("itemCount");
+        const emptyItems = document.getElementById("emptyItems");
+
+        // Product options are generated by Razor and safely encoded for HTML.
+        const productOptions = `
+            <option value="">Select a product</option>
+            @foreach (var product in Model.Products)
+            {
+                    <option value="@product.ProductId"
+                            data-price="@product.SellingPrice">
+                        @product.Name
+                    </option>
+            }
+        `;
+
+        function calculateTotals() {
+            let total = 0;
+            const rows = document.querySelectorAll(".invoice-item");
+
+            rows.forEach(row => {
+                const quantity =
+                    Number(row.querySelector(".quantity").value) || 0;
+
+                const price =
+                    Number(row.querySelector(".price").value) || 0;
+
+                const subtotal = quantity * price;
+
+                row.querySelector(".subtotal").textContent =
+                    subtotal.toLocaleString("en-GH", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+
+                total += subtotal;
+            });
+
+            grandTotalElement.textContent =
+                total.toLocaleString("en-GH", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+
+            itemCountElement.textContent = rows.length;
+
+            emptyItems.classList.toggle("d-none", rows.length > 0);
+        }
+
+        function reindexItems() {
+            document.querySelectorAll(".invoice-item").forEach((row, index) => {
+                row.querySelector(".product-select").name =
+                    `Items[${index}].ProductId`;
+
+                row.querySelector(".quantity").name =
+                    `Items[${index}].Quantity`;
+
+                row.querySelector(".price").name =
+                    `Items[${index}].SellingPrice`;
+            });
+        }
+
+        function attachEvents(row) {
+            const productSelect = row.querySelector(".product-select");
+            const quantity = row.querySelector(".quantity");
+            const price = row.querySelector(".price");
+
+            productSelect.addEventListener("change", function () {
+                const option = this.options[this.selectedIndex];
+
+                if (option.dataset.price !== undefined &&
+                    option.dataset.price !== "") {
+                    price.value = option.dataset.price;
+                }
+
+                calculateTotals();
+            });
+
+            quantity.addEventListener("input", calculateTotals);
+            price.addEventListener("input", calculateTotals);
+
+            row.querySelector(".removeItem").addEventListener("click", function () {
+                row.remove();
+                reindexItems();
+                calculateTotals();
+            });
+        }
+
+        document.querySelectorAll(".invoice-item").forEach(attachEvents);
+
+        document.getElementById("addItem").addEventListener("click", function () {
+            const index = document.querySelectorAll(".invoice-item").length;
+            const row = document.createElement("tr");
+
+            row.className = "invoice-item";
+
+            row.innerHTML = `
+                <td>
+                    <select name="Items[${index}].ProductId"
+                            class="form-select product-select" required>
+                        ${productOptions}
+                    </select>
+                </td>
+
+                <td>
+                    <input type="number"
+                           name="Items[${index}].Quantity"
+                           value="1" min="1" step="1"
+                           class="form-control quantity" required />
+                </td>
+
+                <td>
+                    <input type="number"
+                           name="Items[${index}].SellingPrice"
+                           value="0.00" min="0.01" step="0.01"
+                           class="form-control price" required />
+                </td>
+
+                <td>
+                    <span class="currency">GH₵ </span>
+                    <span class="subtotal">0.00</span>
+                </td>
+
+                <td class="text-center">
+                    <button type="button"
+                            class="btn-remove removeItem"
+                            title="Remove product"
+                            aria-label="Remove product">
+                        &times;
+                    </button>
+                </td>
+            `;
+
+            itemsBody.appendChild(row);
+            attachEvents(row);
+            reindexItems();
+            calculateTotals();
+        });
+
+        calculateTotals();
+    </script>
+}

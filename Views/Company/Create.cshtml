@@ -1,0 +1,88 @@
+﻿@model InvoiceManagement.ViewModels.CompanyViewModel
+
+<h2>Create Company</h2>
+
+<form asp-action="Create" enctype="multipart/form-data">
+
+    <div asp-validation-summary="All"></div>
+
+    <h4>Company Information</h4>
+
+    <input asp-for="CompanyName" class="form-control" placeholder="Company Name" /><br />
+
+    <input asp-for="Email" class="form-control" placeholder="Company Email" /><br />
+
+    <input asp-for="Phone" class="form-control" placeholder="Phone" /><br />
+
+    <input asp-for="Address" class="form-control" placeholder="Address" /><br />
+
+    <div class="mb-4">
+        <label asp-for="LogoFile"
+               class="form-label fw-semibold">
+            Company Logo
+        </label>
+
+        <div class="border rounded-3 p-4 text-center bg-light">
+
+            <div class="mb-3">
+                <img id="logoPreview"
+                     alt="Company logo preview"
+                     style="width:110px;height:110px;
+                        object-fit:contain;display:none;"
+                     class="rounded border bg-white p-2" />
+            </div>
+
+            <input asp-for="LogoFile"
+                   type="file"
+                   class="form-control"
+                   accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                   onchange="previewLogo(event)" />
+
+            <span asp-validation-for="LogoFile"
+                  class="text-danger small"></span>
+
+            <small class="text-muted d-block mt-2">
+                Upload a PNG, JPG or WEBP logo (maximum 2 MB).
+            </small>
+
+        </div>
+    </div>
+
+    <script>
+        function previewLogo(event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById("logoPreview");
+
+            if (!file) {
+                preview.style.display = "none";
+                preview.removeAttribute("src");
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.style.display = "inline-block";
+            };
+
+            reader.readAsDataURL(file);
+        }
+    </script>
+
+
+    <hr />
+
+    <h4>Company Administrator</h4>
+
+    <input asp-for="AdminFullName" class="form-control" placeholder="Full Name" /><br />
+
+    <input asp-for="AdminEmail" class="form-control" placeholder="Admin Email" /><br />
+
+    <input asp-for="Password" class="form-control" /><br />
+
+    <button class="btn btn-primary">
+        Create Company
+    </button>
+
+</form>

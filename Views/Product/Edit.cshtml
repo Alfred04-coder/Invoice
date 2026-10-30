@@ -1,0 +1,371 @@
+﻿
+@using InvoiceManagement.Models.Data.InvoiceDbContext
+@model InvoiceManagement.ViewModels.ProductViewModel
+
+@{
+    ViewData["Title"] = "Edit Product";
+}
+
+<style>
+    body {
+        background: #f4f5f7;
+    }
+
+    .edit-page {
+        padding: 35px 15px;
+    }
+
+    .page-heading {
+        margin-bottom: 25px;
+    }
+
+        .page-heading h2 {
+            color: #111827;
+            font-weight: 750;
+            letter-spacing: -0.5px;
+            margin-bottom: 7px;
+        }
+
+        .page-heading p {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 0;
+        }
+
+    .edit-card {
+        max-width: 850px;
+        margin: 0 auto;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.05);
+    }
+
+    .edit-card-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 25px 30px;
+        background: #111827;
+        color: #fff;
+    }
+
+    .header-icon {
+        width: 54px;
+        height: 54px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.1);
+        font-size: 25px;
+        flex-shrink: 0;
+    }
+
+    .edit-card-header h4 {
+        font-size: 19px;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    .edit-card-header p {
+        color: #d1d5db;
+        font-size: 13px;
+        margin-bottom: 0;
+    }
+
+    .edit-card-body {
+        padding: 30px;
+    }
+
+    .section-heading {
+        color: #111827;
+        font-size: 14px;
+        font-weight: 700;
+        padding-bottom: 12px;
+        margin-bottom: 22px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .form-label {
+        color: #374151;
+        font-size: 13px;
+        font-weight: 650;
+        margin-bottom: 8px;
+    }
+
+    .form-control {
+        min-height: 46px;
+        border: 1px solid #d1d5db;
+        border-radius: 9px;
+        padding: 11px 13px;
+        font-size: 14px;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    textarea.form-control {
+        min-height: 110px;
+        resize: vertical;
+    }
+
+    .form-control:focus {
+        border-color: #111827;
+        box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.09);
+    }
+
+    .form-text {
+        color: #6b7280;
+        font-size: 12px;
+        margin-top: 6px;
+    }
+
+    .field-validation-error {
+        display: block;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    .validation-summary-errors {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #b91c1c;
+        border-radius: 10px;
+        padding: 13px 16px;
+        margin-bottom: 22px;
+        font-size: 13px;
+    }
+
+        .validation-summary-errors ul {
+            margin-bottom: 0;
+            padding-left: 18px;
+        }
+
+    .edit-actions {
+        display: flex;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding-top: 25px;
+        margin-top: 25px;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .btn-save {
+        background: #111827;
+        color: #fff;
+        border: 1px solid #111827;
+        border-radius: 9px;
+        padding: 11px 22px;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+        .btn-save:hover {
+            background: #000;
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 5px 14px rgba(0, 0, 0, 0.13);
+        }
+
+    .btn-back {
+        background: #fff;
+        color: #374151;
+        border: 1px solid #d1d5db;
+        border-radius: 9px;
+        padding: 11px 20px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+        .btn-back:hover {
+            background: #f3f4f6;
+            color: #111827;
+        }
+
+    .required-mark {
+        color: #dc2626;
+    }
+
+    @@media (max-width: 576px) {
+        .edit-page {
+            padding: 22px 5px;
+        }
+
+        .edit-card-header,
+        .edit-card-body {
+            padding: 22px 18px;
+        }
+
+        .edit-actions {
+            flex-direction: column-reverse;
+        }
+
+            .edit-actions .btn {
+                width: 100%;
+            }
+    }
+</style>
+
+<div class="container edit-page">
+
+    <!-- Page Heading -->
+    <div class="page-heading">
+        <h2>
+            <i class="bi bi-pencil-square me-2"></i>Edit Product
+        </h2>
+
+        <p>Update product information, pricing and inventory details.</p>
+    </div>
+
+    <div class="edit-card">
+
+        <!-- Card Header -->
+        <div class="edit-card-header">
+            <div class="header-icon">
+                <i class="bi bi-box-seam"></i>
+            </div>
+
+            <div>
+                <h4>Product Information</h4>
+                <p>Make the necessary changes and save your updates.</p>
+            </div>
+        </div>
+
+        <!-- Edit Form -->
+        <div class="edit-card-body">
+
+            <form asp-action="Edit" method="post">
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="All"
+                     class="text-danger"
+                     role="alert"></div>
+
+                <input type="hidden" asp-for="ProductId" />
+
+                <h6 class="section-heading">
+                    <i class="bi bi-card-text me-2"></i>Basic Details
+                </h6>
+
+                <div class="row">
+                    <div class="col-12 mb-4">
+                        <label asp-for="Name" class="form-label">
+                            Product Name <span class="required-mark">*</span>
+                        </label>
+
+                        <input asp-for="Name"
+                               class="form-control"
+                               placeholder="Enter product name"
+                               autocomplete="off" />
+
+                        <span asp-validation-for="Name"
+                              class="text-danger field-validation-error"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <label asp-for="CostPrice" class="form-label">
+                            Cost Price <span class="required-mark">*</span>
+                        </label>
+
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">GH₵</span>
+                            <input asp-for="CostPrice"
+                                   class="form-control"
+                                   type="number"
+                                   min="0"
+                                   step="0.01"
+                                   placeholder="0.00" />
+                        </div>
+
+                        <div class="form-text">
+                            The amount paid to acquire the product.
+                        </div>
+
+                        <span asp-validation-for="CostPrice"
+                              class="text-danger field-validation-error"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <label asp-for="SellingPrice" class="form-label">
+                            Selling Price <span class="required-mark">*</span>
+                        </label>
+
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">GH₵</span>
+                            <input asp-for="SellingPrice"
+                                   class="form-control"
+                                   type="number"
+                                   min="0"
+                                   step="0.01"
+                                   placeholder="0.00" />
+                        </div>
+
+                        <div class="form-text">
+                            The price charged to customers.
+                        </div>
+
+                        <span asp-validation-for="SellingPrice"
+                              class="text-danger field-validation-error"></span>
+                    </div>
+                </div>
+
+                <h6 class="section-heading mt-2">
+                    <i class="bi bi-boxes me-2"></i>Inventory Details
+                </h6>
+
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <label asp-for="QuantityInStock" class="form-label">
+                            Current Stock Quantity
+                        </label>
+
+                        <input asp-for="QuantityInStock"
+                               class="form-control"
+                               type="number"
+                               min="0"
+                               step="1"
+                               placeholder="Enter stock quantity" />
+
+                        <div class="form-text">
+                            For stock increases, use the Add Stock page so inventory movements can be tracked.
+                        </div>
+
+                        <span asp-validation-for="QuantityInStock"
+                              class="text-danger field-validation-error"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <label asp-for="Description" class="form-label">
+                            Description
+                        </label>
+
+                        <textarea asp-for="Description"
+                                  class="form-control"
+                                  rows="4"
+                                  placeholder="Enter product description (optional)"></textarea>
+
+                        <span asp-validation-for="Description"
+                              class="text-danger field-validation-error"></span>
+                    </div>
+                </div>
+
+                <div class="edit-actions">
+                    <a asp-action="Index" class="btn btn-back">
+                        <i class="bi bi-arrow-left me-2"></i>Back to Products
+                    </a>
+
+                    <button type="submit" class="btn btn-save">
+                        <i class="bi bi-check2-circle me-2"></i>Save Changes
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

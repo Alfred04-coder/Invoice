@@ -1,0 +1,851 @@
+﻿
+@model List<InvoiceManagement.ViewModels.StockSummaryViewModel>
+
+@{
+    ViewData["Title"] = "Stock Summary";
+
+    var currentFilter = Context.Request.Query["filter"].ToString();
+    var totalSold = Convert.ToInt32(ViewBag.TotalSold ?? 0);
+    var productCount = Model?.Count ?? 0;
+    var topProduct = Model?
+        .OrderByDescending(x => x.QuantitySold)
+        .FirstOrDefault();
+
+    var maxSold = Model?.Any() == true
+        ? Model.Max(x => x.QuantitySold)
+        : 0;
+}
+
+<style>
+    .dashboard-page {
+        background: #f4f4f4;
+        min-height: 100vh;
+        color: #171717;
+        padding-bottom: 40px;
+    }
+
+    .dashboard-navbar {
+        background: #080808;
+        border-bottom: 3px solid #333;
+    }
+
+        .dashboard-navbar .navbar-brand {
+            color: #fff;
+            letter-spacing: -.3px;
+            font-size: 1.25rem;
+        }
+
+        .dashboard-navbar .brand-mark {
+            display: inline-flex;
+            width: 36px;
+            height: 36px;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            color: #080808;
+            border-radius: 10px;
+            margin-right: 8px;
+        }
+
+        .dashboard-navbar .nav-link {
+            color: #d0d0d0;
+            font-size: .88rem;
+            font-weight: 600;
+            padding: 12px 13px !important;
+            border-radius: 7px;
+            transition: .2s ease;
+        }
+
+            .dashboard-navbar .nav-link:hover,
+            .dashboard-navbar .nav-link.active {
+                background: #292929;
+                color: #fff;
+            }
+
+            .dashboard-navbar .nav-link.new-invoice {
+                background: #fff;
+                color: #111;
+                margin-left: 4px;
+            }
+
+                .dashboard-navbar .nav-link.new-invoice:hover {
+                    background: #e5e5e5;
+                    color: #000;
+                }
+
+            .dashboard-navbar .nav-link.logout-link {
+                color: #ffb8b8;
+            }
+
+                .dashboard-navbar .nav-link.logout-link:hover {
+                    background: #351818;
+                    color: #fff;
+                }
+
+    .dashboard-content {
+        padding: 28px 0;
+    }
+
+    .dashboard-title {
+        font-size: clamp(1.5rem, 2vw, 2rem);
+        font-weight: 800;
+        letter-spacing: -.7px;
+        color: #101010;
+        margin-bottom: 5px;
+    }
+
+    .dashboard-subtitle {
+        color: #737373;
+        margin-bottom: 0;
+        font-size: .93rem;
+    }
+
+    .date-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        background: #fff;
+        border: 1px solid #dedede;
+        border-radius: 10px;
+        color: #333;
+        font-size: .86rem;
+        font-weight: 650;
+    }
+    body {
+        background: #f4f6fa;
+        font-family: 'Segoe UI', sans-serif;
+        color: #1e293b;
+    }
+
+    .navbar {
+        background: #111827 !important;
+        padding: 15px 0;
+    }
+
+    .navbar-brand {
+        font-size: 1.4rem;
+        letter-spacing: .3px;
+    }
+
+    .navbar .nav-link {
+        color: #cbd5e1 !important;
+        font-size: .88rem;
+        padding: 9px 12px !important;
+        border-radius: 7px;
+        transition: .2s;
+    }
+
+    .navbar .nav-link:hover,
+    .navbar .nav-link.active {
+        background: #334155;
+        color: #fff !important;
+    }
+
+    .page-heading {
+        font-size: 1.8rem;
+        font-weight: 750;
+        color: #0f172a;
+    }
+
+    .page-subtitle {
+        color: #64748b;
+        font-size: .93rem;
+    }
+
+    .summary-card {
+        border: none;
+        border-radius: 14px;
+        background: white;
+        padding: 23px;
+        height: 100%;
+        box-shadow: 0 4px 18px rgba(15,23,42,.05);
+        transition: transform .2s;
+    }
+
+    .summary-card:hover {
+        transform: translateY(-3px);
+    }
+
+    .summary-label {
+        font-size: .85rem;
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    .summary-number {
+        font-size: 1.9rem;
+        font-weight: 750;
+        margin-top: 10px;
+        color: #0f172a;
+    }
+
+    .summary-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        font-size: 1.4rem;
+    }
+
+    .icon-blue {
+        background: #dbeafe;
+        color: #2563eb;
+    }
+
+    .icon-green {
+        background: #dcfce7;
+        color: #16a34a;
+    }
+
+    .icon-purple {
+        background: #ede9fe;
+        color: #7c3aed;
+    }
+
+    .dashboard-card {
+        background: white;
+        border: 1px solid #e8edf4;
+        border-radius: 14px;
+        box-shadow: 0 4px 18px rgba(15,23,42,.04);
+        overflow: hidden;
+    }
+
+    .section-title {
+        font-weight: 700;
+        font-size: 1.08rem;
+        margin: 0;
+    }
+
+    .filter-btn {
+        border: 1px solid #e2e8f0;
+        background: #fff;
+        color: #475569;
+        padding: 9px 17px;
+        font-size: .85rem;
+        font-weight: 600;
+        border-radius: 8px;
+        text-decoration: none;
+        display: inline-block;
+        transition: .2s;
+    }
+
+    .filter-btn:hover {
+        background: #eff6ff;
+        color: #2563eb;
+        border-color: #bfdbfe;
+    }
+
+    .filter-btn.active {
+        background: #1d4ed8;
+        color: white;
+        border-color: #1d4ed8;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        border: 1px solid #dbe2ea;
+        padding: 11px 13px;
+        font-size: .9rem;
+    }
+
+    .form-control:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 .2rem rgba(37,99,235,.1);
+    }
+
+    .form-label {
+        font-size: .85rem;
+        font-weight: 600;
+        color: #475569;
+    }
+
+    .btn-search {
+        background: #1d4ed8;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 11px 22px;
+        font-weight: 600;
+    }
+
+    .btn-search:hover {
+        background: #1e40af;
+        color: white;
+    }
+
+    .stock-table {
+        margin-bottom: 0;
+        vertical-align: middle;
+    }
+
+    .stock-table thead th {
+        background: #f8fafc;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        font-size: .75rem;
+        font-weight: 700;
+        padding: 16px 20px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .stock-table tbody td {
+        padding: 17px 20px;
+        border-color: #f1f5f9;
+        font-size: .91rem;
+    }
+
+    .stock-table tbody tr:hover {
+        background: #f8fafc;
+    }
+
+    .product-icon {
+        width: 38px;
+        height: 38px;
+        background: #eff6ff;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #2563eb;
+        font-size: 1.1rem;
+        margin-right: 12px;
+    }
+
+    .quantity-badge {
+        background: #dcfce7;
+        color: #15803d;
+        border-radius: 20px;
+        padding: 7px 13px;
+        font-weight: 700;
+        font-size: .83rem;
+    }
+
+    .progress {
+        height: 7px;
+        background: #e2e8f0;
+        border-radius: 20px;
+    }
+
+    .progress-bar {
+        background: #2563eb;
+        border-radius: 20px;
+    }
+
+    .search-input {
+        max-width: 280px;
+    }
+
+    .table-footer {
+        background: #f8fafc;
+        padding: 17px 22px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    @@media (max-width: 768px) {
+        .page-heading {
+            font-size: 1.4rem;
+        }
+
+        .summary-number {
+            font-size: 1.5rem;
+        }
+
+        .search-input {
+            max-width: 100%;
+        }
+
+        .filter-btn {
+            padding: 8px 11px;
+            font-size: .78rem;
+        }
+    }
+</style>
+
+<!-- NAVIGATION -->
+<nav class="navbar navbar-expand-xl navbar-dark dashboard-navbar">
+    <div class="container-fluid px-3 px-lg-4">
+        <a class="navbar-brand fw-bold d-flex align-items-center"
+           asp-controller="Admin" asp-action="Dashboard">
+            <span class="brand-mark"><i class="bi bi-receipt-cutoff"></i></span>
+            MyInvoice
+        </a>
+
+        <button class="navbar-toggler" type="button"
+                data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+                aria-controls="mainNavbar" aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNavbar">
+            <ul class="navbar-nav me-auto my-2 my-xl-0 gap-xl-1">
+                <li class="nav-item">
+                    <a class="nav-link active" asp-controller="Admin" asp-action="Dashboard">
+                        <i class="bi bi-grid-1x2-fill me-1"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Admin" asp-action="SalesList">
+                        <i class="bi bi-receipt me-1"></i> Sales
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Admin" asp-action="Debtors">
+                        <i class="bi bi-wallet2 me-1"></i> Customer Debts
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Product" asp-action="Index">
+                        <i class="bi bi-box-seam me-1"></i> Products
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Product" asp-action="StockSummary">
+                        <i class="bi bi-clipboard-data me-1"></i> Stock Summary
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link new-invoice" asp-controller="Staff" asp-action="Create">
+                        <i class="bi bi-plus-lg me-1"></i> New Invoice
+                    </a>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav ms-xl-2">
+                <li class="nav-item">
+                    <a class="nav-link logout-link" asp-controller="Account" asp-action="LogIn">
+                        <i class="bi bi-box-arrow-right me-1"></i> Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<div class="container-fluid px-3 px-lg-5 py-4">
+
+    <!-- PAGE HEADER -->
+    <div class="d-flex flex-wrap justify-content-between
+                align-items-center gap-3 mb-4">
+
+        <div>
+            <h2 class="page-heading mb-1">
+                Stock Summary
+            </h2>
+            <p class="page-subtitle mb-0">
+                Monitor product sales and stock movement performance.
+            </p>
+        </div>
+
+        <div>
+            <span class="badge bg-white text-dark border
+                         px-3 py-2 shadow-sm">
+                📅 @DateTime.Today.ToString("dd MMM yyyy")
+            </span>
+        </div>
+
+    </div>
+
+    <!-- SUMMARY CARDS -->
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-6 col-xl-4">
+            <div class="summary-card">
+
+                <div class="d-flex justify-content-between">
+                    <span class="summary-label">
+                        Total Units Sold
+                    </span>
+
+                    <div class="summary-icon icon-blue">
+                        📦
+                    </div>
+                </div>
+
+                <div class="summary-number">
+                    @totalSold.ToString("N0")
+                </div>
+
+                <small class="text-muted">
+                    Within selected period
+                </small>
+
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-4">
+            <div class="summary-card">
+
+                <div class="d-flex justify-content-between">
+                    <span class="summary-label">
+                        Products Sold
+                    </span>
+
+                    <div class="summary-icon icon-green">
+                        📊
+                    </div>
+                </div>
+
+                <div class="summary-number">
+                    @productCount.ToString("N0")
+                </div>
+
+                <small class="text-muted">
+                    Different products in report
+                </small>
+
+            </div>
+        </div>
+
+        <div class="col-md-12 col-xl-4">
+            <div class="summary-card">
+
+                <div class="d-flex justify-content-between">
+                    <span class="summary-label">
+                        Top Selling Product
+                    </span>
+
+                    <div class="summary-icon icon-purple">
+                        🏆
+                    </div>
+                </div>
+
+                <div class="fw-bold fs-5 mt-3 text-truncate"
+                     title="@(topProduct?.ProductName ?? "No sales")">
+                    @(topProduct?.ProductName ?? "No sales")
+                </div>
+
+                <small class="text-muted">
+                    @(topProduct != null
+                        ? $"{topProduct.QuantitySold:N0} units sold"
+                        : "No product sales recorded")
+                </small>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- FILTER SECTION -->
+    <div class="dashboard-card mb-4">
+
+        <div class="p-4">
+
+            <div class="d-flex align-items-center
+                        justify-content-between mb-3">
+                <h5 class="section-title">
+                    📅 Filter Stock Report
+                </h5>
+            </div>
+
+            <p class="text-muted small">
+                Select a quick period or choose your own date range.
+            </p>
+
+            <!-- QUICK FILTERS -->
+            <div class="d-flex flex-wrap gap-2 mb-4">
+
+                <a asp-action="StockSummary"
+                   asp-route-filter="today"
+                   class="filter-btn @(currentFilter == "today" ? "active" : "")">
+                    Today
+                </a>
+
+                <a asp-action="StockSummary"
+                   asp-route-filter="yesterday"
+                   class="filter-btn @(currentFilter == "yesterday" ? "active" : "")">
+                    Yesterday
+                </a>
+
+                <a asp-action="StockSummary"
+                   asp-route-filter="3days"
+                   class="filter-btn @(currentFilter == "3days" ? "active" : "")">
+                    Last 3 Days
+                </a>
+
+                <a asp-action="StockSummary"
+                   asp-route-filter="thisweek"
+                   class="filter-btn @(currentFilter == "thisweek" ? "active" : "")">
+                    This Week
+                </a>
+
+                <a asp-action="StockSummary"
+                   asp-route-filter="lastweek"
+                   class="filter-btn @(currentFilter == "lastweek" ? "active" : "")">
+                    Last Week
+                </a>
+
+            </div>
+
+            <!-- CUSTOM DATE FILTER -->
+            <form asp-action="StockSummary"
+                  method="get"
+                  class="row g-3 align-items-end">
+
+                <div class="col-md-4">
+
+                    <label class="form-label">
+                        Start Date
+                    </label>
+
+                    <input type="date"
+                           name="startDate"
+                           class="form-control"
+                           value="@(ViewBag.StartDate != null
+                               ? ((DateTime)ViewBag.StartDate).ToString("yyyy-MM-dd")
+                               : "")" />
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <label class="form-label">
+                        End Date
+                    </label>
+
+                    <input type="date"
+                           name="endDate"
+                           class="form-control"
+                           value="@(ViewBag.EndDate != null
+                               ? ((DateTime)ViewBag.EndDate).ToString("yyyy-MM-dd")
+                               : "")" />
+
+                </div>
+
+                <div class="col-md-4">
+                    <button type="submit"
+                            class="btn btn-search w-100">
+                        🔍 Apply Date Filter
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+    <!-- STOCK TABLE -->
+    <div class="dashboard-card">
+
+        <div class="p-4 d-flex flex-wrap
+                    justify-content-between
+                    align-items-center gap-3">
+
+            <div>
+                <h5 class="section-title">
+                    📦 Product Sales Breakdown
+                </h5>
+
+                <small class="text-muted">
+                    Quantity of each product sold during the period
+                </small>
+            </div>
+
+            <div class="search-input w-100">
+                <input type="search"
+                       id="productSearch"
+                       class="form-control"
+                       placeholder="🔍 Search product..."
+                       aria-label="Search products" />
+            </div>
+
+        </div>
+
+        <div class="table-responsive">
+
+            <table class="table stock-table"
+                   id="stockTable">
+
+                <thead>
+                    <tr>
+                        <th style="width: 80px;">#</th>
+                        <th>Product Name</th>
+                        <th>Quantity Sold</th>
+                        <th style="min-width: 180px;">
+                            Sales Distribution
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @if (Model != null && Model.Any())
+                    {
+                        var index = 1;
+
+                        foreach (var item in Model
+                            .OrderByDescending(x => x.QuantitySold))
+                        {
+                            var percentage = maxSold > 0
+                                ? (double)item.QuantitySold /
+                                  (double)maxSold * 100
+                                : 0;
+
+                            <tr class="product-row">
+
+                                <td class="text-muted">
+                                    @index
+                                </td>
+
+                                <td>
+                                    <div class="d-flex align-items-center">
+
+                                        <span class="product-icon">
+                                            📦
+                                        </span>
+
+                                        <span class="fw-semibold product-name">
+                                            @item.ProductName
+                                        </span>
+
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <span class="quantity-badge">
+                                        @item.QuantitySold.ToString("N0") Units
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <div class="progress"
+                                         role="progressbar"
+                                         aria-label="Relative quantity sold"
+                                         aria-valuenow="@percentage.ToString("0", System.Globalization.CultureInfo.InvariantCulture)"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100">
+
+                                        <div class="progress-bar"
+                                             style="width: @(percentage.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))%">
+                                        </div>
+
+                                    </div>
+                                    <small class="text-muted">
+                                        Relative to top seller
+                                    </small>
+                                </td>
+
+                            </tr>
+
+                            index++;
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4"
+                                class="text-center py-5">
+
+                                <div class="fs-1 mb-2">📦</div>
+
+                                <h6 class="fw-bold">
+                                    No Sales Found
+                                </h6>
+
+                                <p class="text-muted mb-0">
+                                    No products were sold within
+                                    the selected date range.
+                                </p>
+
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <div id="searchEmpty"
+             class="text-center py-4 text-muted d-none">
+            No products match your search.
+        </div>
+
+        <!-- TABLE FOOTER -->
+        <div class="table-footer d-flex flex-wrap
+                    justify-content-between
+                    align-items-center gap-2">
+
+            <div class="text-muted small">
+                Showing
+                <strong id="visibleCount">@productCount</strong>
+                of @productCount products
+            </div>
+
+            <div class="fw-bold">
+                Total Units Sold:
+                <span class="text-primary">
+                    @totalSold.ToString("N0")
+                </span>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <div class="text-center text-muted small mt-4 pb-3">
+        MyInvoice • Inventory & Sales Management System
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const searchInput =
+                document.getElementById("productSearch");
+
+            const rows =
+                document.querySelectorAll(".product-row");
+
+            const visibleCount =
+                document.getElementById("visibleCount");
+
+            const searchEmpty =
+                document.getElementById("searchEmpty");
+
+            searchInput.addEventListener("input", function () {
+
+                const searchText =
+                    this.value.toLowerCase().trim();
+
+                let count = 0;
+
+                rows.forEach(row => {
+
+                    const productName =
+                        row.querySelector(".product-name")
+                           .textContent.toLowerCase();
+
+                    const matches =
+                        productName.includes(searchText);
+
+                    row.style.display =
+                        matches ? "" : "none";
+
+                    if (matches) {
+                        count++;
+                    }
+
+                });
+
+                visibleCount.textContent = count;
+
+                searchEmpty.classList.toggle(
+                    "d-none",
+                    count !== 0 || rows.length === 0
+                );
+
+            });
+
+        });
+    </script>
+}

@@ -1,0 +1,489 @@
+﻿@model IEnumerable<InvoiceManagement.ViewModel.InvoiceViewModel>
+
+@{
+    ViewData["Title"] = "Customer Invoices";
+
+    var invoices = Model?.ToList() ?? new List<InvoiceManagement.ViewModel.InvoiceViewModel>();
+    var customer = invoices.FirstOrDefault();
+
+    var totalAmount = invoices.Sum(i => i.GrandTotal);
+    var totalPaid = invoices.Sum(i => i.AmountPaid);
+    var totalBalance = invoices.Sum(i => i.Balance);
+}
+
+<style>
+    .customer-invoices-page {
+        background: #f2f2f2;
+        min-height: 100vh;
+        padding: 28px 0 45px;
+        color: #171717;
+    }
+
+        .customer-invoices-page .page-title {
+            font-size: 1.65rem;
+            font-weight: 750;
+            color: #000;
+            letter-spacing: -.5px;
+        }
+
+        .customer-invoices-page .subtitle {
+            color: #707070;
+            font-size: .92rem;
+        }
+
+        .customer-invoices-page .summary-card {
+            background: #fff;
+            border: 1px solid #dedede;
+            border-top: 4px solid #111;
+            border-radius: 12px;
+            padding: 21px;
+            height: 100%;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, .05);
+        }
+
+        .customer-invoices-page .summary-label {
+            font-size: .83rem;
+            color: #666;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .customer-invoices-page .summary-value {
+            font-size: 1.4rem;
+            font-weight: 750;
+            color: #000;
+            overflow-wrap: anywhere;
+        }
+
+        .customer-invoices-page .summary-icon {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: #111;
+            color: #fff;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .customer-invoices-page .content-card {
+            background: #fff;
+            border: 1px solid #dedede;
+            border-radius: 13px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, .06);
+            overflow: hidden;
+        }
+
+        .customer-invoices-page .card-heading {
+            padding: 21px 24px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .customer-invoices-page .table {
+            margin-bottom: 0;
+            white-space: nowrap;
+        }
+
+            .customer-invoices-page .table thead th {
+                background: #111;
+                color: #fff;
+                padding: 16px 18px;
+                font-size: .75rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: .5px;
+                border: none;
+            }
+
+            .customer-invoices-page .table tbody td {
+                padding: 17px 18px;
+                border-color: #e8e8e8;
+                color: #292929;
+                font-size: .88rem;
+                vertical-align: middle;
+            }
+
+            .customer-invoices-page .table tbody tr:hover td {
+                background: #f7f7f7;
+            }
+
+        .customer-invoices-page .invoice-number {
+            font-weight: 750;
+            color: #000;
+        }
+
+        .customer-invoices-page .balance-badge {
+            background: #ededed;
+            border: 1px solid #d2d2d2;
+            color: #000;
+            border-radius: 6px;
+            padding: 7px 10px;
+            font-weight: 750;
+            display: inline-block;
+        }
+
+        .customer-invoices-page .total-row td {
+            background: #e9e9e9;
+            color: #000;
+            padding: 18px;
+            font-weight: 750;
+            border-top: 2px solid #111;
+        }
+
+        .customer-invoices-page .back-button {
+            display: inline-block;
+            background: #111;
+            color: #fff;
+            border: 1px solid #111;
+            border-radius: 8px;
+            padding: 10px 16px;
+            text-decoration: none;
+            font-size: .9rem;
+            font-weight: 600;
+            transition: .2s;
+        }
+
+            .customer-invoices-page .back-button:hover {
+                background: #333;
+                color: #fff;
+            }
+
+        .customer-invoices-page .search-box {
+            position: relative;
+            max-width: 300px;
+        }
+
+            .customer-invoices-page .search-box input {
+                border: 1px solid #ccc;
+                border-radius: 8px;
+                padding: 10px 13px 10px 37px;
+                font-size: .85rem;
+            }
+
+                .customer-invoices-page .search-box input:focus {
+                    border-color: #111;
+                    box-shadow: 0 0 0 3px rgba(0, 0, 0, .08);
+                }
+
+        .customer-invoices-page .search-icon {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #555;
+            pointer-events: none;
+        }
+
+        .customer-invoices-page .empty-state {
+            text-align: center;
+            padding: 55px 20px;
+        }
+
+        .customer-invoices-page .empty-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 14px;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #111;
+            color: #fff;
+            font-size: 1.7rem;
+        }
+
+    @@media (max-width: 767px) {
+        .customer-invoices-page {
+            padding-top: 18px;
+        }
+
+            .customer-invoices-page .page-title {
+                font-size: 1.4rem;
+            }
+
+            .customer-invoices-page .summary-card {
+                padding: 16px;
+            }
+
+            .customer-invoices-page .summary-value {
+                font-size: 1.15rem;
+            }
+
+            .customer-invoices-page .card-heading {
+                padding: 18px;
+            }
+
+            .customer-invoices-page .search-box {
+                max-width: 100%;
+                width: 100%;
+            }
+    }
+</style>
+
+<div class="customer-invoices-page">
+    <div class="container-fluid px-3 px-lg-4">
+
+        <!-- Page heading -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+            <div>
+                <h2 class="page-title mb-1">Customer Invoices</h2>
+                <p class="subtitle mb-0">
+                    View the customer's invoice history and outstanding payments.
+                </p>
+            </div>
+
+            <a asp-controller="Staff"
+               asp-action="Index"
+               class="back-button">
+                <i class="bi bi-arrow-left me-2"></i> Back to Dashboard
+            </a>
+        </div>
+
+        <!-- Customer information -->
+        @if (customer != null)
+        {
+            <div class="content-card mb-4">
+                <div class="p-4 d-flex flex-wrap align-items-center gap-3">
+                    <div class="summary-icon" style="width:54px;height:54px;font-size:1.5rem;">
+                        <i class="bi bi-person"></i>
+                    </div>
+
+                    <div>
+                        <div class="text-muted small mb-1">Customer Name</div>
+                        <h5 class="fw-bold mb-1">@customer.CustomerName</h5>
+                        <div class="text-muted small">
+                            <i class="bi bi-telephone me-1"></i>
+                            @customer.CustomerPhone
+                        </div>
+                    </div>
+
+                    <div class="ms-md-auto text-md-end">
+                        <div class="text-muted small">Number of Invoices</div>
+                        <h4 class="fw-bold mb-0">@invoices.Count</h4>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Summary cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-12 col-md-4">
+                <div class="summary-card">
+                    <div class="d-flex justify-content-between align-items-start gap-3">
+                        <div>
+                            <div class="summary-label">Total Invoice Value</div>
+                            <div class="summary-value">
+                                GH₵ @totalAmount.ToString("N2")
+                            </div>
+                            <small class="text-muted">Combined invoice amounts</small>
+                        </div>
+                        <div class="summary-icon">
+                            <i class="bi bi-receipt"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <div class="summary-card">
+                    <div class="d-flex justify-content-between align-items-start gap-3">
+                        <div>
+                            <div class="summary-label">Total Amount Paid</div>
+                            <div class="summary-value">
+                                GH₵ @totalPaid.ToString("N2")
+                            </div>
+                            <small class="text-muted">Payments recorded</small>
+                        </div>
+                        <div class="summary-icon">
+                            <i class="bi bi-check2-circle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <div class="summary-card">
+                    <div class="d-flex justify-content-between align-items-start gap-3">
+                        <div>
+                            <div class="summary-label">Outstanding Balance</div>
+                            <div class="summary-value">
+                                GH₵ @totalBalance.ToString("N2")
+                            </div>
+                            <small class="text-muted">Remaining amount due</small>
+                        </div>
+                        <div class="summary-icon">
+                            <i class="bi bi-wallet2"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Invoice history table -->
+        <div class="content-card">
+            <div class="card-heading">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                    <div>
+                        <h5 class="fw-bold mb-1">Invoice History</h5>
+                        <p class="text-muted small mb-0">
+                            <span id="invoiceCount">@invoices.Count</span> invoice(s) found
+                        </p>
+                    </div>
+
+                    <div class="search-box">
+                        <i class="bi bi-search search-icon"></i>
+                        <input type="text"
+                               id="invoiceSearch"
+                               class="form-control"
+                               placeholder="Search invoice..."
+                               aria-label="Search customer invoices" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table" id="invoicesTable">
+                    <thead>
+                        <tr>
+                            <th>Invoice No.</th>
+                            <th>Invoice Date</th>
+                            <th>Customer</th>
+                            <th class="text-end">Grand Total</th>
+                            <th class="text-end">Amount Paid</th>
+                            <th class="text-end">Balance Due</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (invoices.Any())
+                        {
+                            foreach (var item in invoices)
+                            {
+                                <tr>
+                                    <td>
+                                        <span class="invoice-number">
+                                            @item.InvoiceNumber
+                                        </span>
+                                    </td>
+                                    <td>
+                                        @item.InvoiceDate.ToString("dd MMM yyyy")
+                                    </td>
+                                    <td>@item.CustomerName</td>
+                                    <td class="text-end">
+                                        GH₵ @item.GrandTotal.ToString("N2")
+                                    </td>
+                                    <td class="text-end">
+                                        GH₵ @item.AmountPaid.ToString("N2")
+                                    </td>
+                                    <td class="text-end">
+                                        <span class="balance-badge">
+                                            GH₵ @item.Balance.ToString("N2")
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr id="emptyRow">
+                                <td colspan="6">
+                                    <div class="empty-state">
+                                        <div class="empty-icon">
+                                            <i class="bi bi-receipt"></i>
+                                        </div>
+                                        <h5 class="fw-bold">No invoices found</h5>
+                                        <p class="text-muted mb-0">
+                                            No invoices were found for this customer's phone number.
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                    @if (invoices.Any())
+                    {
+                        <tfoot>
+                            <tr class="total-row" id="totalsRow">
+                                <td colspan="3">TOTAL</td>
+                                <td class="text-end">
+                                    GH₵ @totalAmount.ToString("N2")
+                                </td>
+                                <td class="text-end">
+                                    GH₵ @totalPaid.ToString("N2")
+                                </td>
+                                <td class="text-end">
+                                    GH₵ @totalBalance.ToString("N2")
+                                </td>
+                            </tr>
+                        </tfoot>
+                    }
+                </table>
+            </div>
+
+            <div class="px-4 py-3 border-top">
+                <small class="text-muted">
+                    <i class="bi bi-shield-check me-1"></i>
+                    Customer invoice records.
+                </small>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("invoiceSearch");
+        const table = document.getElementById("invoicesTable");
+        const countDisplay = document.getElementById("invoiceCount");
+
+        if (!searchInput || !table) return;
+
+        searchInput.addEventListener("input", function () {
+            const term = this.value.toLowerCase().trim();
+            const rows = table.querySelectorAll("tbody tr");
+            let visibleCount = 0;
+
+            rows.forEach(function (row) {
+                if (row.id === "emptyRow") return;
+
+                const matches = row.textContent.toLowerCase().includes(term);
+                row.style.display = matches ? "" : "none";
+
+                if (matches) visibleCount++;
+            });
+
+            if (countDisplay) {
+                countDisplay.textContent = visibleCount;
+            }
+
+            const totalsRow = document.getElementById("totalsRow");
+            if (totalsRow) {
+                totalsRow.style.display = term ? "none" : "";
+            }
+
+            let noResults = document.getElementById("noInvoiceResults");
+
+            if (visibleCount === 0 &&
+                rows.length > 0 &&
+                !document.getElementById("emptyRow")) {
+
+                if (!noResults) {
+                    noResults = document.createElement("tr");
+                    noResults.id = "noInvoiceResults";
+                    noResults.innerHTML =
+                        '<td colspan="6" class="text-center py-5 text-muted">' +
+                        '<i class="bi bi-search me-2"></i>' +
+                        'No matching invoices found.</td>';
+
+                    table.querySelector("tbody").appendChild(noResults);
+                }
+            } else if (noResults) {
+                noResults.remove();
+            }
+        });
+    });
+</script>

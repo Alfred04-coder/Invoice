@@ -1,0 +1,313 @@
+﻿
+@using InvoiceManagement.Models
+@model Product
+
+@{
+    ViewData["Title"] = "Add Stock";
+}
+
+<style>
+    body {
+        background: #f4f5f7;
+    }
+
+    .stock-page {
+        padding: 35px 15px;
+    }
+
+    .page-heading {
+        margin-bottom: 25px;
+    }
+
+        .page-heading h2 {
+            color: #111827;
+            font-weight: 750;
+            letter-spacing: -0.5px;
+            margin-bottom: 7px;
+        }
+
+        .page-heading p {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 0;
+        }
+
+    .stock-card {
+        max-width: 650px;
+        margin: 0 auto;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.05);
+    }
+
+    .stock-card-header {
+        background: #111827;
+        color: #fff;
+        padding: 25px 30px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .stock-header-icon {
+        width: 55px;
+        height: 55px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.1);
+        font-size: 25px;
+        flex-shrink: 0;
+    }
+
+    .stock-card-header h4 {
+        font-size: 19px;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    .stock-card-header p {
+        color: #d1d5db;
+        font-size: 13px;
+        margin-bottom: 0;
+    }
+
+    .stock-card-body {
+        padding: 30px;
+    }
+
+    .form-label {
+        color: #374151;
+        font-weight: 650;
+        font-size: 13px;
+        margin-bottom: 9px;
+    }
+
+    .form-control {
+        min-height: 47px;
+        border: 1px solid #d1d5db;
+        border-radius: 9px;
+        font-size: 14px;
+        padding: 11px 13px;
+    }
+
+        .form-control:focus {
+            border-color: #111827;
+            box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.09);
+        }
+
+    .product-display {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 16px;
+        display: flex;
+        align-items: center;
+        gap: 13px;
+    }
+
+    .product-display-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 11px;
+        background: #e5e7eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 21px;
+        color: #111827;
+        flex-shrink: 0;
+    }
+
+    .product-display small {
+        display: block;
+        color: #6b7280;
+        font-size: 12px;
+        margin-bottom: 4px;
+    }
+
+    .product-display strong {
+        color: #111827;
+        font-size: 15px;
+        overflow-wrap: anywhere;
+    }
+
+    .input-help {
+        color: #6b7280;
+        font-size: 12px;
+        margin-top: 7px;
+    }
+
+    .stock-tip {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        background: #f3f4f6;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 13px 15px;
+        margin-top: 22px;
+        color: #4b5563;
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+        .stock-tip i {
+            font-size: 17px;
+            color: #111827;
+        }
+
+    .stock-actions {
+        display: flex;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        gap: 10px;
+        border-top: 1px solid #e5e7eb;
+        margin-top: 25px;
+        padding-top: 23px;
+    }
+
+    .btn-stock {
+        background: #111827;
+        color: #fff;
+        border: 1px solid #111827;
+        border-radius: 9px;
+        padding: 11px 20px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+        .btn-stock:hover {
+            background: #000;
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+    .btn-back {
+        background: #fff;
+        color: #374151;
+        border: 1px solid #d1d5db;
+        border-radius: 9px;
+        padding: 11px 18px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+        .btn-back:hover {
+            background: #f3f4f6;
+            color: #111827;
+        }
+
+    @@media (max-width: 576px) {
+        .stock-page {
+            padding: 22px 5px;
+        }
+
+        .stock-card-header,
+        .stock-card-body {
+            padding: 22px 18px;
+        }
+
+        .stock-actions {
+            flex-direction: column-reverse;
+        }
+
+            .stock-actions .btn {
+                width: 100%;
+            }
+    }
+</style>
+
+<div class="container stock-page">
+
+    <!-- Page heading -->
+    <div class="page-heading">
+        <h2>
+            <i class="bi bi-box-seam me-2"></i>Add Stock
+        </h2>
+
+        <p>Update your inventory by adding more units to an existing product.</p>
+    </div>
+
+    <div class="stock-card">
+
+        <!-- Header -->
+        <div class="stock-card-header">
+            <div class="stock-header-icon">
+                <i class="bi bi-box-arrow-in-down"></i>
+            </div>
+
+            <div>
+                <h4>Stock Update</h4>
+                <p>Enter the quantity you want to add to your inventory.</p>
+            </div>
+        </div>
+
+        <!-- Form body -->
+        <div class="stock-card-body">
+
+            <form asp-action="AddStock" method="post">
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" name="productId" value="@Model.ProductId" />
+
+                <div class="mb-4">
+                    <label class="form-label">Selected Product</label>
+
+                    <div class="product-display">
+                        <div class="product-display-icon">
+                            <i class="bi bi-box-seam"></i>
+                        </div>
+
+                        <div>
+                            <small>Product name</small>
+                            <strong>@Model.Name</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="quantity" class="form-label">
+                        Quantity to Add <span class="text-danger">*</span>
+                    </label>
+
+                    <input type="number"
+                           id="quantity"
+                           name="quantity"
+                           class="form-control"
+                           min="1"
+                           step="1"
+                           placeholder="Enter quantity, e.g. 20"
+                           required />
+
+                    <div class="input-help">
+                        Enter a whole number greater than zero.
+                    </div>
+                </div>
+
+                <div class="stock-tip">
+                    <i class="bi bi-info-circle-fill"></i>
+                    <div>
+                        <strong>Important:</strong>
+                        Only enter the additional quantity you are receiving.
+                        The system should add this quantity to the product's existing stock.
+                    </div>
+                </div>
+
+                <div class="stock-actions">
+                    <a asp-action="Index" class="btn btn-back">
+                        <i class="bi bi-arrow-left me-2"></i>Back to Products
+                    </a>
+
+                    <button type="submit" class="btn btn-stock">
+                        <i class="bi bi-plus-circle me-2"></i>Add Stock
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,112 @@
+﻿@model List<InvoiceManagement.ViewModels.StockSummaryViewModel>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+    <div class="container-fluid">
+        <!-- Brand -->
+        <a class="navbar-brand fw-bold" asp-controller="Dashboard" asp-action="AdminDashboard">
+            🧾 MyInvoice
+        </a>
+
+        <!-- Toggle (mobile) -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Menu -->
+        <div class="collapse navbar-collapse" id="mainNavbar">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="StaffInvoice" asp-action="Dashboard">📊 Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="StaffInvoice" asp-action="SalesList">📄 Sales</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="StaffInvoice" asp-action="CustomerDebts">💳 Customer Debts</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Product" asp-action="Index">📦 Product List</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="StaffInvoice" asp-action="StockSummary">📦 Stock Summary</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-warning fw-semibold" asp-controller="StaffInvoice" asp-action="Create">➕ New Invoice</a>
+                </li>
+            </ul>
+
+            <!-- Right side -->
+            <ul class="navbar-nav">
+
+                <li class="nav-item">
+                    <a class="nav-link text-danger" asp-controller="Account" asp-action="Logout">🚪 Logout</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<br />
+<br />
+
+<div class="container mt-4">
+
+    <form method="get" class="row g-3 mb-3">
+        <div class="mb-3">
+
+            <a asp-action="StockSummary" asp-route-filter="today" class="btn btn-info">Today</a>
+
+            <a asp-action="StockSummary" asp-route-filter="yesterday" class="btn btn-primary">Yesterday</a>
+
+            <a asp-action="StockSummary" asp-route-filter="3days" class="btn btn-success">Last 3 Days</a>
+
+            <a asp-action="StockSummary" asp-route-filter="thisweek" class="btn btn-warning">This Week</a>
+
+            <a asp-action="StockSummary" asp-route-filter="lastweek" class="btn btn-danger">Last Week</a>
+
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Start Date</label>
+            <input type="date" class="form-control"
+                   name="startDate"
+                   value="@(ViewBag.StartDate != null ? ((DateTime)ViewBag.StartDate).ToString("yyyy-MM-dd") : "")">
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">End Date</label>
+            <input type="date" class="form-control"
+                   name="endDate"
+                   value="@(ViewBag.EndDate != null ? ((DateTime)ViewBag.EndDate).ToString("yyyy-MM-dd") : "")">
+        </div>
+
+        <div class="col-md-4 d-flex align-items-end">
+            <button class="btn btn-primary w-100">Search</button>
+        </div>
+
+    </form>
+
+    <div class="alert alert-success">
+        <strong>Total Products Sold:</strong> @ViewBag.TotalSold
+    </div>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Total Sold</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.ProductName</td>
+                    <td>@item.QuantitySold</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <h4>Total Sold: @ViewBag.TotalSold</h4>
+
+</div>

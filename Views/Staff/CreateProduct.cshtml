@@ -1,0 +1,92 @@
+﻿@model InvoiceManagement.Models.Product
+
+@{
+    ViewData["Title"] = "Create Product";
+}
+
+<h2>Create Product</h2>
+
+<hr />
+
+<form asp-action="Staff" method="CreateProduct">
+
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <div class="mb-3">
+
+        <label asp-for="Name" class="form-label"></label>
+
+        <input asp-for="Name" class="form-control" />
+
+        <span asp-validation-for="Name" class="text-danger"></span>
+
+    </div>
+
+    <div class="mb-3">
+
+        <label asp-for="CostPrice"></label>
+
+        <input asp-for="CostPrice" class="form-control" />
+
+        <span asp-validation-for="CostPrice" class="text-danger"></span>
+
+    </div>
+
+    <div class="mb-3">
+
+        <label asp-for="SellingPrice"></label>
+
+        <input asp-for="SellingPrice" class="form-control" />
+
+        <span asp-validation-for="SellingPrice" class="text-danger"></span>
+
+    </div>
+
+    <div class="mb-3">
+
+        <label asp-for="QuantityInStock"></label>
+
+        <input asp-for="QuantityInStock" class="form-control" />
+
+        <span asp-validation-for="QuantityInStock" class="text-danger"></span>
+
+    </div>
+
+    <div class="mb-3">
+
+        <label asp-for="Description"></label>
+
+        <textarea asp-for="Description"
+                  rows="4"
+                  class="form-control"></textarea>
+
+    </div>
+
+    @*     <div class="mb-3">
+
+        <label asp-for="ExpiryDate"></label>
+
+        <input asp-for="ExpiryDate"
+               type="date"
+               class="form-control" />
+
+    </div> *@
+
+    <button class="btn btn-success">
+        Save Product
+    </button>
+
+    <a asp-action="Index"
+       class="btn btn-secondary">
+        Back
+    </a>
+
+</form>
+
+@section Scripts {
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+}

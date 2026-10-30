@@ -1,0 +1,74 @@
+﻿@model IEnumerable<InvoiceManagement.Models.Company>
+
+<h2>Companies</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-success">
+        New Company
+    </a>
+</p>
+
+<table class="table table-bordered">
+
+    <thead>
+
+        <tr>
+
+            <th>Company</th>
+
+            <th>Email</th>
+
+            <th>Phone</th>
+
+            <th>Status</th>
+
+            <th></th>
+
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+
+                <td>@item.CompanyName</td>
+
+                <td>@item.Email</td>
+
+                <td>@item.Phone</td>
+
+                <td>
+
+                    @(item.IsActive ? "Active" : "Inactive")
+
+                </td>
+
+                <td>
+
+                    <a asp-action="Edit"
+                       asp-route-id="@item.CompanyId"
+                       class="btn btn-warning">
+
+                        Edit
+
+                    </a>
+
+                    <a asp-action="ToggleStatus"
+                       asp-route-id="@item.CompanyId"
+                       class="btn btn-secondary">
+
+                        @(item.IsActive ? "Deactivate" : "Activate")
+
+                    </a>
+
+                </td>
+
+            </tr>
+        }
+
+    </tbody>
+
+</table>

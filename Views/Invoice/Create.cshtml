@@ -1,0 +1,97 @@
+@* @model InvoiceManagement.Models.Invoice
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Invoice</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="InvoiceDate" class="control-label"></label>
+                <input asp-for="InvoiceDate" class="form-control" />
+                <span asp-validation-for="InvoiceDate" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="CustomerName" class="control-label"></label>
+                <input asp-for="CustomerName" class="form-control" />
+                <span asp-validation-for="CustomerName" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="GrandTotal" class="control-label"></label>
+                <input asp-for="GrandTotal" class="form-control" />
+                <span asp-validation-for="GrandTotal" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="AmountPaid" class="control-label"></label>
+                <input asp-for="AmountPaid" class="form-control" />
+                <span asp-validation-for="AmountPaid" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Balance" class="control-label"></label>
+                <input asp-for="Balance" class="form-control" />
+                <span asp-validation-for="Balance" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="IsCredit" class="control-label"></label>
+                <input asp-for="IsCredit" class="form-check-input" />
+                <span asp-validation-for="IsCredit" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="CompanyId" class="control-label"></label>
+                <input asp-for="CompanyId" class="form-control" />
+                <span asp-validation-for="CompanyId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="CustomerId" class="control-label"></label>
+                <input asp-for="CustomerId" class="form-control" />
+                <span asp-validation-for="CustomerId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Company" class="control-label"></label>
+                <input asp-for="Company" class="form-control" />
+                <span asp-validation-for="Company" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Customer" class="control-label"></label>
+                <input asp-for="Customer" class="form-control" />
+                <span asp-validation-for="Customer" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="InvoiceItems" class="control-label"></label>
+                <input asp-for="InvoiceItems" class="form-control" />
+                <span asp-validation-for="InvoiceItems" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Payments" class="control-label"></label>
+                <input asp-for="Payments" class="form-control" />
+                <span asp-validation-for="Payments" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+ *@

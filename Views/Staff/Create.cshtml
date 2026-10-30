@@ -1,0 +1,260 @@
+﻿@using System.Globalization
+@using System.Text.Json
+@model InvoiceManagement.ViewModel.InvoiceViewModel
+@{
+    ViewData["Title"] = "Create Invoice";
+    var products = Model.Products;
+    var items = Model.Items;
+    var productData = products.Select(p => new
+    {
+        id = p.ProductId,
+        name = p.Name,
+        price = p.SellingPrice,
+        stock = p.QuantityInStock
+    });
+    var productJson = JsonSerializer.Serialize(productData);
+}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div><h2 class="fw-bold">Create Invoice</h2><p class="text-muted mb-0">@* Prices can be overridden per invoice. *@</p></div>
+    </div>
+    <form asp-controller="Staff" asp-action="Create" method="post" id="invoiceForm">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+        <div class="card shadow-sm mb-4">
+            <div class="card-header fw-bold">Customer Information</div>
+            <div class="card-body row g-3">
+                <div class="col-md-4"><label asp-for="CustomerName" class="form-label"></label><input asp-for="CustomerName" class="form-control" required /><span asp-validation-for="CustomerName" class="text-danger"></span></div>
+                <div class="col-md-4"><label asp-for="CustomerPhone" class="form-label"></label><input asp-for="CustomerPhone" class="form-control" /><span asp-validation-for="CustomerPhone" class="text-danger"></span></div>
+                <div class="col-md-4"><label asp-for="Address" class="form-label"></label><input asp-for="Address" class="form-control" /><span asp-validation-for="Address" class="text-danger"></span></div>
+            </div>
+        </div>
+        <div class="card shadow-sm mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center"><strong>Invoice Items</strong><button type="button" id="addItem" class="btn btn-primary btn-sm">+ Add Product</button></div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle">
+                        <thead class="table-light"><tr><th style="min-width:200px">Product</th><th>Stock</th><th>Quantity</th><th style="min-width:160px">Selling Price (GH₵)</th><th>Line Total (GH₵)</th><th></th></tr></thead>
+                        <tbody id="itemsBody">
+                            @if (items != null)
+                            {
+                                for (int i = 0; i < items.Count; i++)
+                                {
+                                    <tr class="invoice-row">
+                                        <td>
+                                            <select name="Items[@i].ProductId" class="form-select product-select" required>
+                                                <option value="">Select product</option>
+                                                @foreach (var p in products)
+                                                {
+                                                    <option value="@p.ProductId" selected="@(items[i].ProductId == p.ProductId)">@p.Name</option>
+                                                }
+                                            </select>
+                                        </td>
+                                        <td><span class="stock-label">-</span></td>
+                                        <td><input name="Items[@i].Quantity" type="number" min="1" step="1" class="form-control quantity-input" value="@(items[i].Quantity > 0 ? items[i].Quantity : 1)" required /></td>
+                                        <td><input name="Items[@i].SellingPrice" type="number" min="0.01" step="0.01" class="form-control price-input" placeholder="Use default price" value="@(items[i].SellingPrice.ToString(CultureInfo.InvariantCulture))" /><small class="text-muted default-price-label"></small></td>
+                                        <td class="fw-semibold"><span class="line-total">0.00</span></td>
+                                        <td><button type="button" class="btn btn-outline-danger btn-sm remove-row">Remove</button></td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div id="stockError" class="text-danger mb-3" role="alert"></div>
+                <div class="text-end">Subtotal: GH₵ <span id="subtotal">0.00</span></div>
+            </div>
+        </div>
+        <div class="card shadow-sm mb-4">
+            <div class="card-header fw-bold">Optional Tax</div>
+            <div class="card-body">
+                <div class="form-check form-switch mb-3">
+                    <input asp-for="ApplyTax" class="form-check-input" id="applyTax" />
+                    <label class="form-check-label" for="applyTax">Apply tax</label>
+                </div>
+                <div id="taxControls" class="row g-3" hidden>
+                    <div class="col-md-6">
+                        <label asp-for="TaxType" class="form-label">Tax type</label>
+                        <select asp-for="TaxType" class="form-select" id="taxType">
+                            <option value="Percentage">Percentage (%)</option>
+                            <option value="Fixed">Fixed amount (GH₵)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="TaxValue" class="form-label">Tax value</label>
+                        <input asp-for="TaxValue" type="number" min="0" step="0.01" class="form-control" id="taxValue" />
+                    </div>
+                </div>
+                <div class="text-end mt-3">Tax: GH₵ <span id="taxAmount">0.00</span></div>
+                <div class="text-end fs-5 fw-bold">Grand Total: GH₵ <span id="grandTotal">0.00</span></div>
+            </div>
+        </div>
+        <div class="card shadow-sm mb-4">
+            <div class="card-header fw-bold">Payment Details</div>
+            <div class="card-body">
+                <div class="form-check form-switch mb-3"><input asp-for="IsCredit" class="form-check-input" id="isCredit" /><label for="isCredit" class="form-check-label">Credit Sale</label></div>
+                <div class="row g-3">
+                    <div class="col-md-4"><label asp-for="AmountPaid" class="form-label">Amount Paid (GH₵)</label><input asp-for="AmountPaid" type="number" min="0" step="0.01" id="amountPaid" class="form-control" /></div>
+                    <div class="col-md-4"><label for="balanceDue" class="form-label">Balance Due (GH₵)</label><input id="balanceDue" class="form-control" readonly /></div>
+                </div>
+                <div class="mt-3"><span class="badge bg-secondary" id="paymentStatus">Unpaid</span></div>
+            </div>
+        </div>
+        <div class="d-flex gap-2 justify-content-end"><button type="reset" class="btn btn-outline-secondary">Clear Form</button><button type="submit" class="btn btn-success btn-lg">Save Invoice</button></div>
+    </form>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (() => {
+            const products = @Html.Raw(productJson);
+            const byId = new Map(products.map(p => [String(p.id), p]));
+            const form = document.getElementById('invoiceForm');
+            const body = document.getElementById('itemsBody');
+            const credit = document.getElementById('isCredit');
+            const amount = document.getElementById('amountPaid');
+            const error = document.getElementById('stockError');
+            const totalLabel = document.getElementById('grandTotal');
+            const subtotalLabel = document.getElementById('subtotal');
+            const taxAmountLabel = document.getElementById('taxAmount');
+            const applyTax = document.getElementById('applyTax');
+            const taxType = document.getElementById('taxType');
+            const taxValue = document.getElementById('taxValue');
+            const taxControls = document.getElementById('taxControls');
+            const balanceLabel = document.getElementById('balanceDue');
+            const status = document.getElementById('paymentStatus');
+            const money = n => (Number(n) || 0).toFixed(2);
+            const productOptions = () => {
+                const frag = document.createDocumentFragment();
+                for (const p of products) {
+                    const opt = document.createElement('option');
+                    opt.value = p.id;
+                    opt.textContent = p.name;
+                    frag.appendChild(opt);
+                }
+                return frag;
+            };
+            function addRow() {
+                const row = document.createElement('tr');
+                row.className = 'invoice-row';
+                row.innerHTML = `<td><select class="form-select product-select" required><option value="">Select product</option></select></td>
+                    <td><span class="stock-label">-</span></td>
+                    <td><input type="number" class="form-control quantity-input" min="1" step="1" value="1" required></td>
+                    <td><input type="number" class="form-control price-input" min="0.01" step="0.01" placeholder="Use default price"><small class="text-muted default-price-label"></small></td>
+                    <td class="fw-semibold"><span class="line-total">0.00</span></td>
+                    <td><button type="button" class="btn btn-outline-danger btn-sm remove-row">Remove</button></td>`;
+                row.querySelector('select').appendChild(productOptions());
+                body.appendChild(row);
+                reindex(); updateTotals();
+            }
+            function reindex() {
+                body.querySelectorAll('.invoice-row').forEach((row, i) => {
+                    row.querySelector('.product-select').name = `Items[${i}].ProductId`;
+                    row.querySelector('.quantity-input').name = `Items[${i}].Quantity`;
+                    row.querySelector('.price-input').name = `Items[${i}].SellingPrice`;
+                });
+            }
+            function updateTotals() {
+                let total = 0;
+                const errors = [];
+                const quantities = new Map();
+                body.querySelectorAll('.invoice-row').forEach(row => {
+                    const select = row.querySelector('.product-select');
+                    const p = byId.get(select.value);
+                    const qtyInput = row.querySelector('.quantity-input');
+                    const priceInput = row.querySelector('.price-input');
+                    const qty = Number(qtyInput.value);
+                    const original = Number(p?.price || 0);
+                    const price = priceInput.value.trim() === '' ? original : Number(priceInput.value);
+                    row.querySelector('.stock-label').textContent = p ? p.stock : '-';
+                    row.querySelector('.default-price-label').textContent = p ? `Default: GH₵ ${money(original)}` : '';
+                    row.querySelector('.line-total').textContent = money(p ? qty * price : 0);
+                    qtyInput.setCustomValidity(''); priceInput.setCustomValidity('');
+                    if (!p) return;
+                    if (!Number.isInteger(qty) || qty <= 0) {
+                        errors.push(`${p.name}: quantity must be a positive whole number.`);
+                        qtyInput.setCustomValidity('Enter a valid quantity.');
+                    }
+                    if (!Number.isFinite(price) || price <= 0) {
+                        errors.push(`${p.name}: selling price must be greater than zero.`);
+                        priceInput.setCustomValidity('Enter a valid selling price.');
+                    }
+                    quantities.set(String(p.id), (quantities.get(String(p.id)) || 0) + qty);
+                    if (qty > 0 && price > 0) total += qty * price;
+                });
+                for (const [id, qty] of quantities) {
+                    const p = byId.get(id);
+                    if (qty > Number(p.stock)) errors.push(`${p.name}: requested ${qty}, only ${p.stock} available.`);
+                }
+                total = Math.round((total + Number.EPSILON) * 100) / 100;
+                subtotalLabel.textContent = money(total);
+                taxControls.hidden = !applyTax.checked;
+                const rawTaxValue = Number(taxValue.value);
+                if (applyTax.checked && (!Number.isFinite(rawTaxValue) || rawTaxValue < 0)) {
+                    errors.push('Enter a valid non-negative tax value.');
+                }
+                if (applyTax.checked && taxType.value === 'Percentage' && rawTaxValue > 100) {
+                    errors.push('Tax percentage cannot exceed 100%.');
+                }
+                const tax = !applyTax.checked ? 0 : taxType.value === 'Percentage'
+                    ? total * rawTaxValue / 100 : rawTaxValue;
+                const roundedTax = Math.round((tax + Number.EPSILON) * 100) / 100;
+                total = Math.round((total + roundedTax + Number.EPSILON) * 100) / 100;
+                taxAmountLabel.textContent = money(roundedTax);
+                totalLabel.textContent = money(total);
+                if (!credit.checked) { amount.value = money(total); amount.readOnly = true; }
+                else amount.readOnly = false;
+                const paid = credit.checked ? Number(amount.value) : total;
+                if (!Number.isFinite(paid) || paid < 0 || paid > total) errors.push('Amount paid must be between zero and the grand total.');
+                const balance = total - paid;
+                balanceLabel.value = money(balance);
+                status.textContent = balance <= 0 && total > 0 ? 'Fully paid' : paid > 0 ? 'Partially paid' : 'Unpaid';
+                status.className = balance <= 0 && total > 0 ? 'badge bg-success' : 'badge bg-warning text-dark';
+                error.textContent = errors.join(' ');
+                return errors;
+            }
+            document.getElementById('addItem').addEventListener('click', addRow);
+            body.addEventListener('change', e => {
+                if (e.target.matches('.product-select')) {
+                    const row = e.target.closest('.invoice-row');
+                    row.querySelector('.price-input').value = ''; // blank = use original
+                    row.querySelector('.quantity-input').value = '1';
+                }
+                updateTotals();
+            });
+            body.addEventListener('input', e => {
+                if (e.target.matches('.quantity-input, .price-input')) updateTotals();
+            });
+            body.addEventListener('click', e => {
+                if (!e.target.matches('.remove-row')) return;
+                const row = e.target.closest('.invoice-row');
+                if (body.querySelectorAll('.invoice-row').length === 1) {
+                    row.querySelector('.product-select').value = '';
+                    row.querySelector('.price-input').value = '';
+                    row.querySelector('.quantity-input').value = '1';
+                } else row.remove();
+                reindex(); updateTotals();
+            });
+            credit.addEventListener('change', () => { amount.value = credit.checked ? '0.00' : totalLabel.textContent; updateTotals(); });
+            amount.addEventListener('input', updateTotals);
+            applyTax.addEventListener('change', updateTotals);
+            taxType.addEventListener('change', updateTotals);
+            taxValue.addEventListener('input', updateTotals);
+            form.addEventListener('submit', e => {
+                reindex();
+                if (!body.querySelector('.product-select') || ![...body.querySelectorAll('.product-select')].some(s => s.value)) {
+                    e.preventDefault(); error.textContent = 'Select at least one product.'; return;
+                }
+                if (updateTotals().length || Number(totalLabel.textContent) <= 0) {
+                    e.preventDefault();
+                    if (!error.textContent) error.textContent = 'Invoice total must be greater than zero.';
+                }
+            });
+            form.addEventListener('reset', () => setTimeout(() => {
+                body.innerHTML = ''; addRow(); amount.value = '0.00'; updateTotals();
+            }, 0));
+            if (!body.querySelector('.invoice-row')) addRow();
+            reindex(); updateTotals();
+        })();
+    </script>
+}

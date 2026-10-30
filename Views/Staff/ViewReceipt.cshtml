@@ -1,0 +1,129 @@
+﻿
+@model InvoiceManagement.ViewModel.ReceiptViewModel
+
+@{
+    ViewData["Title"] = "Payment Receipt";
+}
+
+<div class="container py-5">
+    <div class="card border-0 shadow-sm mx-auto" style="max-width: 760px;">
+        <div class="card-header bg-dark text-white p-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="mb-1">@Model.CompanyName</h4>
+                    <div class="small text-light">
+                        @Model.CompanyAddress
+                    </div>
+                    <div class="small text-light">
+                        @Model.CompanyPhone
+                    </div>
+                </div>
+                <div class="text-end">
+                    <h5 class="mb-1">PAYMENT RECEIPT</h5>
+                    <span class="small">@Model.ReceiptNumber</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body p-4">
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <div class="text-muted small">RECEIVED FROM</div>
+                    <h5 class="mb-1">@Model.CustomerName</h5>
+                    <div>@Model.CustomerPhone</div>
+                </div>
+
+                <div class="col-md-6 text-md-end">
+                    <div class="text-muted small">PAYMENT DATE</div>
+                    <div class="fw-semibold">
+                        @Model.PaymentDate.ToString("dd MMM yyyy, hh:mm tt")
+                    </div>
+
+                    <div class="text-muted small mt-2">INVOICE NUMBER</div>
+                    <div class="fw-semibold">@Model.InvoiceNumber</div>
+                </div>
+            </div>
+
+            <hr />
+
+            <div class="text-muted small mb-2">AMOUNT RECEIVED</div>
+            <h2 class="fw-bold mb-4">
+                GH₵ @Model.AmountReceived.ToString("N2")
+            </h2>
+
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle">
+                    <tbody>
+                        <tr>
+                            <th>Payment method</th>
+                            <td>@Model.PaymentMethod</td>
+                        </tr>
+                        <tr>
+                            <th>Payment reference</th>
+                            <td>
+                                @(string.IsNullOrWhiteSpace(Model.Reference)
+                                    ? "N/A"
+                                    : Model.Reference)
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Invoice total</th>
+                            <td>GH₵ @Model.InvoiceTotal.ToString("N2")</td>
+                        </tr>
+                        <tr>
+                            <th>Total paid to date</th>
+                            <td>GH₵ @Model.TotalPaid.ToString("N2")</td>
+                        </tr>
+                        <tr>
+                            <th>Outstanding after this payment</th>
+                            <td class="fw-bold @(Model.BalanceAfterPayment > 0
+                                ? "text-danger" : "text-success")">
+                                GH₵ @Model.BalanceAfterPayment.ToString("N2")
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="alert alert-light border text-center mt-4 mb-0">
+                Thank you for your payment.
+            </div>
+        </div>
+
+        <div class="card-footer bg-white p-3 d-flex justify-content-between">
+            <a asp-action="InvoiceResult"
+               asp-route-id="@Model.InvoiceNumber.Replace("INV-", "")"
+               class="btn btn-outline-secondary">
+                Back to Invoice
+            </a>
+
+            <button type="button"
+                    class="btn btn-dark"
+                    onclick="window.print()">
+                Print Receipt
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+    @@media print {
+        body {
+            background: white !important;
+        }
+
+        .btn, .navbar, footer {
+            display: none !important;
+        }
+
+        .container {
+            max-width: 100% !important;
+            padding: 0 !important;
+        }
+
+        .card {
+            box-shadow: none !important;
+            border: 1px solid #ddd !important;
+        }
+    }
+</style>

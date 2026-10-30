@@ -1,0 +1,908 @@
+﻿@model InvoiceManagement.ViewModel.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<style>
+    .dashboard-page {
+        background: #f4f4f4;
+        min-height: 100vh;
+        color: #171717;
+        padding-bottom: 40px;
+    }
+
+    .dashboard-navbar {
+        background: #080808;
+        border-bottom: 3px solid #333;
+    }
+
+        .dashboard-navbar .navbar-brand {
+            color: #fff;
+            letter-spacing: -.3px;
+            font-size: 1.25rem;
+        }
+
+        .dashboard-navbar .brand-mark {
+            display: inline-flex;
+            width: 36px;
+            height: 36px;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            color: #080808;
+            border-radius: 10px;
+            margin-right: 8px;
+        }
+
+        .dashboard-navbar .nav-link {
+            color: #d0d0d0;
+            font-size: .88rem;
+            font-weight: 600;
+            padding: 12px 13px !important;
+            border-radius: 7px;
+            transition: .2s ease;
+        }
+
+            .dashboard-navbar .nav-link:hover,
+            .dashboard-navbar .nav-link.active {
+                background: #292929;
+                color: #fff;
+            }
+
+            .dashboard-navbar .nav-link.new-invoice {
+                background: #fff;
+                color: #111;
+                margin-left: 4px;
+            }
+
+                .dashboard-navbar .nav-link.new-invoice:hover {
+                    background: #e5e5e5;
+                    color: #000;
+                }
+
+            .dashboard-navbar .nav-link.logout-link {
+                color: #ffb8b8;
+            }
+
+                .dashboard-navbar .nav-link.logout-link:hover {
+                    background: #351818;
+                    color: #fff;
+                }
+
+    .dashboard-content {
+        padding: 28px 0;
+    }
+
+    .dashboard-title {
+        font-size: clamp(1.5rem, 2vw, 2rem);
+        font-weight: 800;
+        letter-spacing: -.7px;
+        color: #101010;
+        margin-bottom: 5px;
+    }
+
+    .dashboard-subtitle {
+        color: #737373;
+        margin-bottom: 0;
+        font-size: .93rem;
+    }
+
+    .date-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        background: #fff;
+        border: 1px solid #dedede;
+        border-radius: 10px;
+        color: #333;
+        font-size: .86rem;
+        font-weight: 650;
+    }
+
+    .period-filter {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+        .period-filter .btn {
+            border-radius: 8px !important;
+            border: 1px solid #d0d0d0;
+            color: #333;
+            background: #fff;
+            padding: 9px 15px;
+            font-size: .86rem;
+            font-weight: 650;
+        }
+
+            .period-filter .btn:hover,
+            .period-filter .btn.active {
+                background: #111;
+                border-color: #111;
+                color: #fff;
+            }
+
+    .stat-card {
+        height: 100%;
+        background: #fff;
+        border: 1px solid #e2e2e2;
+        border-radius: 14px;
+        padding: 21px;
+        box-shadow: 0 5px 18px rgba(0, 0, 0, .035);
+        position: relative;
+        overflow: hidden;
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 9px 24px rgba(0, 0, 0, .075);
+        }
+
+        .stat-card::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: #111;
+        }
+
+    .stat-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .stat-label {
+        color: #737373;
+        font-size: .82rem;
+        font-weight: 650;
+        margin-bottom: 12px;
+    }
+
+    .stat-value {
+        color: #111;
+        font-size: clamp(1.45rem, 2vw, 1.9rem);
+        font-weight: 800;
+        letter-spacing: -.6px;
+        overflow-wrap: anywhere;
+        line-height: 1.2;
+    }
+
+    .stat-note {
+        color: #888;
+        font-size: .78rem;
+        margin-top: 9px;
+    }
+
+    .stat-icon {
+        width: 46px;
+        height: 46px;
+        flex: 0 0 46px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: #111;
+        color: #fff;
+        font-size: 1.25rem;
+    }
+
+    .panel-card {
+        background: #fff;
+        border: 1px solid #e1e1e1;
+        border-radius: 14px;
+        box-shadow: 0 5px 18px rgba(0, 0, 0, .035);
+        overflow: hidden;
+        height: 100%;
+    }
+
+    .panel-header {
+        padding: 20px 22px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        border-bottom: 1px solid #ededed;
+    }
+
+    .panel-title {
+        font-size: 1rem;
+        font-weight: 750;
+        color: #151515;
+        margin: 0;
+    }
+
+    .panel-subtitle {
+        color: #858585;
+        font-size: .81rem;
+        margin: 5px 0 0;
+    }
+
+    .panel-body {
+        padding: 20px 22px;
+    }
+
+    .dashboard-page .table {
+        margin-bottom: 0;
+        white-space: nowrap;
+    }
+
+        .dashboard-page .table thead th {
+            background: #111;
+            color: #fff;
+            border: 0;
+            padding: 13px 15px;
+            font-size: .72rem;
+            letter-spacing: .45px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .dashboard-page .table tbody td {
+            padding: 14px 15px;
+            border-color: #ededed;
+            vertical-align: middle;
+            color: #333;
+            font-size: .86rem;
+        }
+
+        .dashboard-page .table tbody tr:hover td {
+            background: #f8f8f8;
+        }
+
+    .invoice-code {
+        color: #111;
+        font-weight: 750;
+    }
+
+    .money-value {
+        font-weight: 750;
+        color: #111;
+    }
+
+    .btn-dark-custom {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        background: #111;
+        border: 1px solid #111;
+        color: #fff;
+        border-radius: 8px;
+        padding: 9px 13px;
+        font-size: .83rem;
+        font-weight: 650;
+        text-decoration: none;
+        transition: .2s ease;
+    }
+
+        .btn-dark-custom:hover {
+            background: #333;
+            border-color: #333;
+            color: #fff;
+        }
+
+    .btn-light-custom {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        background: #fff;
+        border: 1px solid #d5d5d5;
+        color: #222;
+        border-radius: 8px;
+        padding: 9px 13px;
+        font-size: .83rem;
+        font-weight: 650;
+        text-decoration: none;
+        transition: .2s ease;
+    }
+
+        .btn-light-custom:hover {
+            background: #f0f0f0;
+            color: #000;
+            border-color: #aaa;
+        }
+
+    .quick-action {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        padding: 14px;
+        border: 1px solid #e5e5e5;
+        border-radius: 10px;
+        text-decoration: none;
+        color: #222;
+        background: #fff;
+        transition: .2s ease;
+    }
+
+        .quick-action:hover {
+            border-color: #111;
+            background: #f7f7f7;
+            color: #000;
+            transform: translateX(2px);
+        }
+
+    .quick-action-icon {
+        width: 42px;
+        height: 42px;
+        flex: 0 0 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        background: #111;
+        color: #fff;
+        font-size: 1.15rem;
+    }
+
+    .quick-action-title {
+        font-size: .9rem;
+        font-weight: 750;
+        margin-bottom: 3px;
+    }
+
+    .quick-action-text {
+        font-size: .77rem;
+        color: #858585;
+        margin: 0;
+    }
+
+    .rank-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        border-radius: 9px;
+        background: #ededed;
+        color: #111;
+        font-weight: 800;
+        font-size: .8rem;
+    }
+
+    .empty-message {
+        text-align: center;
+        color: #777;
+        padding: 28px 15px !important;
+    }
+
+    .chart-wrap {
+        position: relative;
+        min-height: 270px;
+    }
+
+        .chart-wrap canvas {
+            max-height: 300px;
+        }
+
+    @@media (max-width: 991.98px) {
+        .dashboard-navbar .nav-link.new-invoice {
+            margin-left: 0;
+            margin-top: 5px;
+        }
+
+        .dashboard-content {
+            padding-top: 22px;
+        }
+    }
+
+    @@media (max-width: 575.98px) {
+        .dashboard-content {
+            padding-top: 18px;
+        }
+
+        .stat-card {
+            padding: 17px;
+        }
+
+        .panel-header,
+        .panel-body {
+            padding: 16px;
+        }
+
+        .date-chip {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="dashboard-page">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-xl navbar-dark dashboard-navbar">
+        <div class="container-fluid px-3 px-lg-4">
+            <a class="navbar-brand fw-bold d-flex align-items-center"
+               asp-controller="Admin" asp-action="Dashboard">
+                <span class="brand-mark"><i class="bi bi-receipt-cutoff"></i></span>
+                MyInvoice
+            </a>
+
+            <button class="navbar-toggler" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+                    aria-controls="mainNavbar" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="mainNavbar">
+                <ul class="navbar-nav me-auto my-2 my-xl-0 gap-xl-1">
+                    <li class="nav-item">
+                        <a class="nav-link active" asp-controller="Admin" asp-action="Dashboard">
+                            <i class="bi bi-grid-1x2-fill me-1"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="SalesList">
+                            <i class="bi bi-receipt me-1"></i> Sales
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="Debtors">
+                            <i class="bi bi-wallet2 me-1"></i> Customer Debts
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Product" asp-action="Index">
+                            <i class="bi bi-box-seam me-1"></i> Products
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Product" asp-action="StockSummary">
+                            <i class="bi bi-clipboard-data me-1"></i> Stock Summary
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link new-invoice" asp-controller="Staff" asp-action="Create">
+                            <i class="bi bi-plus-lg me-1"></i> New Invoice
+                        </a>
+                    </li>
+                </ul>
+
+                <ul class="navbar-nav ms-xl-2">
+                    <li class="nav-item">
+                        <a class="nav-link logout-link" asp-controller="Account" asp-action="LogIn">
+                            <i class="bi bi-box-arrow-right me-1"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="dashboard-content">
+        <div class="container-fluid px-3 px-lg-4">
+
+            <!-- Heading -->
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+                <div>
+                    <h1 class="dashboard-title">Admin Dashboard</h1>
+                    <p class="dashboard-subtitle">A clear overview of your business performance.</p>
+                </div>
+                <div class="date-chip">
+                    <i class="bi bi-calendar3"></i>
+                    @DateTime.Now.ToString("dddd, dd MMMM yyyy")
+                </div>
+            </div>
+
+            <!-- Date filter -->
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+                <div>
+                    <div class="fw-bold mb-1">Sales overview</div>
+                    <div class="text-muted small">Choose a period to update your dashboard figures.</div>
+                </div>
+
+                <div class="period-filter">
+                    <a asp-controller="Admin" asp-action="Dashboard" asp-route-filter="today"
+                       class="btn @(Model.SelectedFilter == "today" ? "active" : "")">
+                        Today
+                    </a>
+                    <a asp-controller="Admin" asp-action="Dashboard" asp-route-filter="month"
+                       class="btn @(Model.SelectedFilter == "month" ? "active" : "")">
+                        This Month
+                    </a>
+                    <a asp-controller="Admin" asp-action="Dashboard" asp-route-filter="year"
+                       class="btn @(Model.SelectedFilter == "year" ? "active" : "")">
+                        This Year
+                    </a>
+                </div>
+            </div>
+
+            <!-- KPI cards -->
+            <div class="row g-3 g-xl-4 mb-4">
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="stat-card">
+                        <div class="stat-top">
+                            <div>
+                                <div class="stat-label">Total Sales</div>
+                                <div class="stat-value counter"
+                                     data-value="@Model.TotalSales" data-prefix="GH₵ ">
+                                    GH₵ 0.00
+                                </div>
+                                <div class="stat-note">For the selected period</div>
+                            </div>
+                            <div class="stat-icon"><i class="bi bi-currency-exchange"></i></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="stat-card">
+                        <div class="stat-top">
+                            <div>
+                                <div class="stat-label">Invoices</div>
+                                <div class="stat-value counter" data-value="@Model.TotalInvoices">0</div>
+                                <div class="stat-note">Invoices recorded</div>
+                            </div>
+                            <div class="stat-icon"><i class="bi bi-receipt"></i></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="stat-card">
+                        <div class="stat-top">
+                            <div>
+                                <div class="stat-label">Products</div>
+                                <div class="stat-value counter" data-value="@Model.TotalProducts">0</div>
+                                <div class="stat-note">Products in your catalogue</div>
+                            </div>
+                            <div class="stat-icon"><i class="bi bi-box-seam"></i></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="stat-card">
+                        <div class="stat-top">
+                            <div>
+                                <div class="stat-label">Low Stock</div>
+                                <div class="stat-value counter" data-value="@Model.LowStockCount">0</div>
+                                <div class="stat-note">Items that may need restocking</div>
+                            </div>
+                            <div class="stat-icon"><i class="bi bi-exclamation-triangle"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main row -->
+            <div class="row g-3 g-xl-4 mb-4">
+                <!-- Recent invoices -->
+                <div class="col-12 col-xl-8">
+                    <section class="panel-card">
+                        <div class="panel-header">
+                            <div>
+                                <h2 class="panel-title">Recent Invoices</h2>
+                                <p class="panel-subtitle">Latest customer transactions</p>
+                            </div>
+                            <a asp-controller="Admin" asp-action="SalesList" class="btn-light-custom">
+                                View All <i class="bi bi-arrow-up-right"></i>
+                            </a>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Invoice</th>
+                                        <th>Customer</th>
+                                        <th>Date</th>
+                                        <th class="text-end">Total</th>
+                                        <th class="text-end">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.RecentInvoices != null && Model.RecentInvoices.Any())
+                                    {
+                                        foreach (var inv in Model.RecentInvoices)
+                                        {
+                                            <tr>
+                                                <td><span class="invoice-code">@inv.InvoiceNumber</span></td>
+                                                <td class="fw-semibold">@inv.CustomerName</td>
+                                                <td class="text-muted">@inv.InvoiceDate.ToString("dd MMM yyyy")</td>
+                                                <td class="text-end"><span class="money-value">GH₵ @inv.GrandTotal.ToString("N2")</span></td>
+                                                <td class="text-end">
+                                                    <a asp-controller="Admin" asp-action="ViewInvoice"
+                                                       asp-route-id="@inv.InvoiceId" class="btn-dark-custom">
+                                                        <i class="bi bi-eye"></i> View
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="5" class="empty-message">
+                                                <i class="bi bi-receipt d-block fs-3 mb-2"></i>
+                                                No invoices found for this period.
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="p-3 border-top">
+                            <a asp-controller="Admin" asp-action="SalesList" class="btn-dark-custom">
+                                <i class="bi bi-list-ul"></i> View All Sales
+                            </a>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Quick actions -->
+                <div class="col-12 col-xl-4">
+                    <section class="panel-card">
+                        <div class="panel-header">
+                            <div>
+                                <h2 class="panel-title">Quick Actions</h2>
+                                <p class="panel-subtitle">Common tasks at your fingertips</p>
+                            </div>
+                            <i class="bi bi-lightning-charge fs-4"></i>
+                        </div>
+
+                        <div class="panel-body d-grid gap-3">
+                            <a asp-controller="Staff" asp-action="Create" class="quick-action">
+                                <span class="quick-action-icon"><i class="bi bi-plus-lg"></i></span>
+                                <span>
+                                    <span class="quick-action-title d-block">Create Invoice</span>
+                                    <span class="quick-action-text">Record a new customer sale</span>
+                                </span>
+                                <i class="bi bi-chevron-right ms-auto"></i>
+                            </a>
+
+                            <a asp-controller="Product" asp-action="Create" class="quick-action">
+                                <span class="quick-action-icon"><i class="bi bi-box-seam"></i></span>
+                                <span>
+                                    <span class="quick-action-title d-block">Add Product</span>
+                                    <span class="quick-action-text">Expand your product catalogue</span>
+                                </span>
+                                <i class="bi bi-chevron-right ms-auto"></i>
+                            </a>
+
+                            <a asp-controller="Admin" asp-action="SalesList" class="quick-action">
+                                <span class="quick-action-icon"><i class="bi bi-bar-chart-line"></i></span>
+                                <span>
+                                    <span class="quick-action-title d-block">Review Sales</span>
+                                    <span class="quick-action-text">Browse your sales history</span>
+                                </span>
+                                <i class="bi bi-chevron-right ms-auto"></i>
+                            </a>
+
+                            <a asp-controller="Product" asp-action="StockSummary" class="quick-action">
+                                <span class="quick-action-icon"><i class="bi bi-clipboard-data"></i></span>
+                                <span>
+                                    <span class="quick-action-title d-block">Check Inventory</span>
+                                    <span class="quick-action-text">Review current stock levels</span>
+                                </span>
+                                <i class="bi bi-chevron-right ms-auto"></i>
+                            </a>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <!-- Top customers table -->
+            <div class="row g-3 g-xl-4 mb-4">
+                <div class="col-12">
+                    <section class="panel-card">
+                        <div class="panel-header">
+                            <div>
+                                <h2 class="panel-title"><i class="bi bi-trophy me-2"></i>Top Customers</h2>
+                                <p class="panel-subtitle">Customers ranked by recorded spending</p>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 90px;">Rank</th>
+                                        <th>Customer</th>
+                                        <th>Invoices</th>
+                                        <th class="text-end">Total Spent</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.TopCustomers != null && Model.TopCustomers.Any())
+                                    {
+                                        var rank = 1;
+                                        foreach (var c in Model.TopCustomers)
+                                        {
+                                            <tr>
+                                                <td><span class="rank-number">@rank</span></td>
+                                                <td class="fw-semibold">@c.CustomerName</td>
+                                                <td>@c.InvoiceCount</td>
+                                                <td class="text-end"><span class="money-value">GH₵ @c.TotalSpent.ToString("N2")</span></td>
+                                            </tr>
+                                            rank++;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="4" class="empty-message">No customer data available yet.</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="row g-3 g-xl-4">
+                <div class="col-12 col-lg-7">
+                    <section class="panel-card">
+                        <div class="panel-header">
+                            <div>
+                                <h2 class="panel-title">Top Customers</h2>
+                                <p class="panel-subtitle">Spending comparison</p>
+                            </div>
+                            <i class="bi bi-bar-chart-line fs-4"></i>
+                        </div>
+                        <div class="panel-body chart-wrap">
+                            <canvas id="topCustomersBar" aria-label="Top customers spending bar chart"></canvas>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="col-12 col-lg-5">
+                    <section class="panel-card">
+                        <div class="panel-header">
+                            <div>
+                                <h2 class="panel-title">Sales Distribution</h2>
+                                <p class="panel-subtitle">Share of spending among top customers</p>
+                            </div>
+                            <i class="bi bi-pie-chart fs-4"></i>
+                        </div>
+                        <div class="panel-body chart-wrap">
+                            <canvas id="topCustomersPie" aria-label="Top customers sales distribution chart"></canvas>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <footer class="text-center text-muted small pt-4">
+                <i class="bi bi-shield-check me-1"></i>
+                MyInvoice · Business overview
+            </footer>
+        </div>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Animate summary counters
+        document.querySelectorAll(".counter").forEach(function (counter) {
+            const target = Number(counter.dataset.value || 0);
+            const prefix = counter.dataset.prefix || "";
+            const isMoney = prefix.length > 0;
+            const duration = 900;
+            const startTime = performance.now();
+
+            function update(now) {
+                const progress = Math.min((now - startTime) / duration, 1);
+                const current = target * progress;
+                counter.textContent = prefix + (isMoney
+                    ? current.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                    : Math.floor(current).toLocaleString());
+
+                if (progress < 1) requestAnimationFrame(update);
+            }
+
+            requestAnimationFrame(update);
+        });
+
+        // Data is safely encoded by Razor for JavaScript.
+        const customerNames = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+                        Model.TopCustomers?.Select(c => c.CustomerName) ?? Enumerable.Empty<string>()));
+        const customerTotals = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+                        Model.TopCustomers?.Select(c => c.TotalSpent) ?? Enumerable.Empty<decimal>()));
+
+        if (typeof Chart !== "undefined") {
+            const labels = customerNames || [];
+            const values = customerTotals || [];
+
+            const barCanvas = document.getElementById("topCustomersBar");
+            if (barCanvas) {
+                new Chart(barCanvas, {
+                    type: "bar",
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: "Total Spent (GH₵)",
+                            data: values,
+                            backgroundColor: "#171717",
+                            borderColor: "#171717",
+                            borderRadius: 6,
+                            maxBarThickness: 42
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        return " GH₵ " + Number(context.raw || 0).toLocaleString(undefined, {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        });
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                ticks: { color: "#666" }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: "#ededed" },
+                                ticks: { color: "#666" }
+                            }
+                        }
+                    }
+                });
+            }
+
+            const pieCanvas = document.getElementById("topCustomersPie");
+            if (pieCanvas) {
+                new Chart(pieCanvas, {
+                    type: "doughnut",
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: values,
+                            backgroundColor: labels.map((_, index) =>
+                                ["#111111", "#454545", "#777777", "#999999", "#c5c5c5", "#dedede"][index % 6]),
+                            borderColor: "#ffffff",
+                            borderWidth: 3,
+                            hoverOffset: 7
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: "62%",
+                        plugins: {
+                            legend: {
+                                position: "bottom",
+                                labels: {
+                                    color: "#444",
+                                    padding: 16,
+                                    usePointStyle: true,
+                                    pointStyle: "circle"
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        return " GH₵ " + Number(context.raw || 0).toLocaleString(undefined, {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    });
+</script>
